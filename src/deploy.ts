@@ -1,5 +1,5 @@
 /**
- * Deploy mn-demo contract to a Midnight network (undeployed by default; use --network preview|preprod for public networks).
+ * Deploy ReliefShield contract to a Midnight network (undeployed by default; use --network preview|preprod for public networks).
  *
  * Non-interactive: scaffold → npm run setup runs straight through.
  * No readline prompts, no .midnight-seed file.
@@ -117,7 +117,7 @@ async function createProviders(walletCtx: WalletContext) {
 
   return {
     privateStateProvider: levelPrivateStateProvider({
-      privateStateStoreName: 'hello-world-state',
+      privateStateStoreName: 'reliefshield-state',
       accountId,
       privateStoragePasswordProvider: () => privateStatePassword,
     }),

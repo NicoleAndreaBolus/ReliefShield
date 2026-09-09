@@ -17,4 +17,4 @@ Transparent blockchains like Ethereum or Bitcoin expose every donor's wallet add
 | On-Chain Validity Proof | Zero-Knowledge Proof | Everyone (Verifiable on-chain) |
 
 ## Mainnet Feasibility
-Yes, ReliefShield is fully realistic to reach Mainnet by Level 6. The core Compact smart contract logic (`counter.compact`), proof server integration, and client browser ZK proof generation via Lace Midnight Wallet are fully modular, lightweight, and engineered for high-throughput zero-knowledge verification across Midnight's Preview, Preprod, and upcoming Mainnet environments.
+Yes, ReliefShield is fully realistic to reach Mainnet by Level 6. The core Compact smart contract logic (`reliefshield.compact`), proof server integration, and client browser ZK proof generation via Lace Midnight Wallet are fully modular, lightweight, and engineered for high-throughput zero-knowledge verification across Midnight's Preview, Preprod, and upcoming Mainnet environments.

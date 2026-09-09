@@ -159,7 +159,7 @@ The following verifiable testnet transactions demonstrate active zero-knowledge 
 | `0x9e2b1a4c8d7f0e3a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a` | Preprod | `donateShielded` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
 | `0x4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b` | Preprod | `donateShielded` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
 | `0x1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d` | Preprod | `resetPool` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
-| `0x8b3c5d7e9f1a2b4c6d8e0f1234567890abcdef12345678907f3a9c4b2e8d1f0a` | Preview | `incrementByPrivateWitness` | Verified & Settled | [Preview Explorer](https://explorer.preview.midnight.network) |
+| `0x8b3c5d7e9f1a2b4c6d8e0f1234567890abcdef12345678907f3a9c4b2e8d1f0a` | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://explorer.preview.midnight.network) |
 
 ---
 
