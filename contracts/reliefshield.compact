@@ -3,27 +3,45 @@ pragma language_version >= 0.23;
 import CompactStandardLibrary;
 
 /**
- * PRIVACY MODEL & ARCHITECTURE — RELIEFSHIELD
- * ===========================================
- * PUBLIC LEDGER STATE (On-Chain, verifiable by all observers):
- *   - `totalReliefPool`: Uint<64> - Aggregated public relief pool balance on Midnight.
+ * RELIEFSHIELD ZERO-KNOWLEDGE CONTRACT
+ * ====================================
+ * A privacy-preserving disaster relief protocol on Midnight Network.
  *
- * PRIVATE WITNESS & INPUTS (Off-Chain, processed strictly inside local browser memory):
- *   - `secretAmount`: Uint<64> - Donor's private contribution witness input.
+ * PUBLIC LEDGER STATE:
+ *   - `totalReliefPool`: Aggregated public relief pool balance (Uint<64>).
+ *   - `admin`: Public 32-byte identity hash of authorized emergency relief administrator.
+ *   - `nullifiers`: Set of 32-byte nullifiers preventing replay attacks on claims & shielded donations.
  *
- * DELIBERATE DISCLOSURE:
- *   - `disclose(secretAmount)`: Discloses the arithmetic result required to increment
- *     the public ledger `totalReliefPool` on-chain without revealing donor identity.
+ * PRIVATE WITNESS & INPUTS:
+ *   - `secretAmount`: Donor's private contribution witness input (Uint<64>).
+ *   - `secretNonce`: Unique salt/entropy for donor privacy and anti-replay nullifier derivation (Bytes<32>).
+ *   - `adminSecret`: Private administrative key required for emergency pool operations (Bytes<32>).
+ *
+ * PRIVACY MODEL & ACCESS CONTROL:
+ *   - Deliberate disclosure only reveals the arithmetic ledger increment, not donor identity.
+ *   - Anti-replay guarantees that each donation or claim can only be processed once.
+ *   - Admin authorization asserts caller possesses the exact secret administrative key.
  */
 
 export ledger totalReliefPool: Uint<64>;
+export ledger admin: Bytes<32>;
+export ledger nullifiers: Set<Bytes<32>>;
 
-// Circuit 1: Donate shielded amount via private witness
-export circuit donateShielded(secretAmount: Uint<64>): [] {
+constructor(initialAdmin: Bytes<32>) {
+    admin = disclose(initialAdmin);
+    totalReliefPool = 0;
+}
+
+// Circuit 1: Donate shielded contribution with anti-replay nullifier
+export circuit donateShielded(secretAmount: Uint<64>, secretNonce: Bytes<32>): [] {
+    assert(secretAmount > 0, "Donation amount must be positive");
+    assert(!nullifiers.member(disclose(secretNonce)), "Nullifier already used: replay rejected");
+    nullifiers.insert(disclose(secretNonce));
     totalReliefPool = (totalReliefPool + disclose(secretAmount)) as Uint<64>;
 }
 
-// Circuit 2: Admin reset relief pool
-export circuit resetPool(newValue: Uint<64>): [] {
+// Circuit 2: Admin-authorized relief pool reset
+export circuit resetPool(adminSecret: Bytes<32>, newValue: Uint<64>): [] {
+    assert(disclose(adminSecret) == admin, "Unauthorized: caller is not authorized admin");
     totalReliefPool = disclose(newValue);
 }

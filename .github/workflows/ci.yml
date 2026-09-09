@@ -34,10 +34,10 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           compact --version || $HOME/.local/bin/compact --version || true
 
-      - name: Compile Compact Contracts
+      - name: Compile ReliefShield Compact Contract
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          npm run compile
+          compact compile +0.31.1 contracts/reliefshield.compact contracts/managed/reliefshield || npm run compile
 
       - name: Run Test Suite
         run: npm test

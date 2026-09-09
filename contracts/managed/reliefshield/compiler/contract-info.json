@@ -4,7 +4,7 @@
   "runtime-version": "0.16.0",
   "circuits": [
     {
-      "name": "incrementByPrivateWitness",
+      "name": "donateShielded",
       "pure": false,
       "proof": true,
       "arguments": [
@@ -13,6 +13,13 @@
           "type": {
             "type-name": "Uint",
             "maxval": 18446744073709551615
+          }
+        },
+        {
+          "name": "secretNonce",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
           }
         }
       ],
@@ -23,10 +30,17 @@
       }
     },
     {
-      "name": "resetCounter",
+      "name": "resetPool",
       "pure": false,
       "proof": true,
       "arguments": [
+        {
+          "name": "adminSecret",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
         {
           "name": "newValue",
           "type": {
@@ -48,13 +62,33 @@
   ],
   "ledger": [
     {
-      "name": "counter",
+      "name": "totalReliefPool",
       "index": 0,
       "exported": true,
       "storage": "Cell",
       "type": {
         "type-name": "Uint",
         "maxval": 18446744073709551615
+      }
+    },
+    {
+      "name": "admin",
+      "index": 1,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "nullifiers",
+      "index": 2,
+      "exported": true,
+      "storage": "Set",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
       }
     }
   ]

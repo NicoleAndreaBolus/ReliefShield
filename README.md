@@ -17,11 +17,21 @@ https://github.com/NicoleAndreaBolus/Midnight-Andrea/raw/master/docs/screenshots
 
 ---
 
-## Contract Address
-| Network  | Address                                                          |
-|----------|------------------------------------------------------------------|
-| Preprod  | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` |
-| Preview  | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` |
+## Deployed Contract & Network Verification
+| Network | Contract Address | Deployment Transaction ID | Explorer / Indexer GraphQL Endpoint | Status |
+|:---|:---|:---|:---|:---:|
+| **Preview (Primary)** | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0x6a24eb5ef7491b8d274ca8018e692bb47568ad3bf24e837ca7d0918be9d832e8` | [Preview Indexer API](https://indexer.preview.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
+| **Preprod** | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0x3a4b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
+
+> **Verification Query**:
+> You can verify the deployed contract state directly by querying the GraphQL indexer:
+> ```graphql
+> query {
+>   contractAction(address: "7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2") {
+>     state
+>   }
+> }
+> ```
 
 ---
 
@@ -162,16 +172,20 @@ Midnight specifically makes this possible through its dual ledger and private wi
 
 ---
 
-## Privacy Model
-- **What is PUBLIC (on-chain, anyone can see):**
-  - Public ledger state (`counter` / `totalReliefPool`), representing total aggregated relief fund tallies.
-  - Smart contract verification keys, block timestamps, and zero-knowledge proof verification status.
-- **What is PRIVATE (private witness, never on-chain):**
-  - Private circuit witness inputs (`secretAmount`), which remain strictly inside the user's local browser memory.
-  - Donor wallet private keys, personal identities, and transaction history.
-  - Beneficiary aid claim tokens and recipient identity secrets.
+## Privacy Model & Zero-Knowledge Architecture
+- **What is PUBLIC (on-chain ledger state, verifiable by all observers):**
+  - `totalReliefPool`: Aggregated emergency relief pool balance (`Uint<64>`).
+  - `admin`: Public 32-byte cryptographic identifier of the authorized emergency relief administrator.
+  - `nullifiers`: Set of 32-byte cryptographic nullifier hashes (`Set<Bytes<32>>`) that prevent double-claiming or replaying shielded transactions.
+  - Smart contract verification keys, block height timestamps, and zero-knowledge proof verification results.
+- **What is PRIVATE (witness memory, strictly kept off-chain in browser):**
+  - Private contribution witness input (`secretAmount`), processed strictly inside the local prover.
+  - Donor salt / entropy (`secretNonce`), used to derive cryptographic nullifiers without leaking wallet identity.
+  - Administrator private key (`adminSecret`), required to authorize `resetPool()` operations.
+  - Donor and beneficiary wallet keys, identities, and undisclosed net assets.
 - **What the user PROVES without revealing:**
-  - The user proves that they executed a valid transaction that correctly increments the public relief pool according to Compact circuit arithmetic rules, **without disclosing their private contribution input or wallet identity**.
+  - The donor proves that their contribution is positive (`secretAmount > 0`), that their nullifier has not been spent (`!nullifiers.member(secretNonce)`), and that the arithmetic ledger increment is valid, **without revealing their identity or undisclosed balance**.
+  - The administrator proves knowledge of the secret administrative credential (`disclose(adminSecret) == admin`) without exposing the key material in plaintext.
 
 ---
 

@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "compile": "compact update 2>/dev/null || ~/.local/bin/compact update 2>/dev/null || true; compact compile contracts/counter.compact managed/counter || ~/.local/bin/compact compile contracts/counter.compact managed/counter || true",
+    "compile": "compact update 2>/dev/null || ~/.local/bin/compact update 2>/dev/null || true; compact compile +0.31.1 contracts/reliefshield.compact contracts/managed/reliefshield || ~/.local/bin/compact compile +0.31.1 contracts/reliefshield.compact contracts/managed/reliefshield || true",
     "setup": "npx tsx src/setup.ts",
     "deploy": "npx tsx src/deploy.ts",
     "cli": "npx tsx src/cli.ts",

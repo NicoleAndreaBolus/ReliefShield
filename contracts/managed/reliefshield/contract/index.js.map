@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../../",
+  "sources": ["contracts/reliefshield.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EA6BA;;;;;;;;;;MAMA,AAAA,cAKC;;;;;cAL6B,cAAsB;cAAE,aAAsB;;;;;;;;;;;;;;;;;;;;;;;;;yCAA9C,cAAsB,+BAAE,aAAsB;;;;;;;;;gDAA9C,cAAsB;gDAAE,aAAsB;;;OAK3E;MAGD,AAAA,SAGC;;;;;cAHwB,aAAsB;cAAE,UAAkB;;;;;;;;;;;;;;;;;;;;;;;;;yCAA1C,aAAsB,+BAAE,UAAkB;;;;;;;;;2CAA1C,aAAsB;2CAAE,UAAkB;;;OAGlE;;;;;;;;;;GAdA;EAHD;;;;;UAAY,cAAuB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAJnC;;;;;;;;;yEAAwC;IACxC;;;;;;;;;yEAA+B;IAC/B;;;;;;;;;;yEAAyC;IAGrC;;;;;;;2HAAiB,cAAY;;yEAAxB;UACL,KAAe;IAAf;;;;;;;2HAAA,KAAe;;yEAAA;;;;;;;GAClB;EAGD,AAAA,iBAKC,4BAL6B,cAAsB,EAAE,aAAsB;4BACjE,cAAY;;qDACX;;;;;;;;;;;4KAA2B,aAAW;;;;0HAA5B;;IAClB;;;;;;;;;;2HAA2B,aAAW;;;;;wEAA5B;UACV,KAAe;;;;;6CAAI;;;;;;;;;;;kHAAe;;qBAAY,cAAY;IAA1D;;;;;;;2HAAA,KAAe;;yEAAA;;GAClB;EAGD,AAAA,YAGC,4BAHwB,aAAsB,EAAE,UAAkB;0CAC/C,aAAW;kEAAK;;;;;;;;;;;uIAAK;;IACrC;;;;;;;2HAA2B,UAAQ;;yEAApB;;GAClB;;;;;;;;;;;;;;;;;;;;IArBD;qCAAA;;;;;;;;;;;0GAAwC;KAAA;IACxC;qCAAA;;;;;;;;;;;0GAA+B;KAAA;IAC/B;;;;;uCAAA;;;;;;;;;;;;;;;;4GAAyC;;;;;;uCAAzC;;;;;;;;;;;;4GAAyC;;;;;;;;;;;;;;uCAAzC;;;;;;;;;;;;;;;4GAAyC;;;;;;;;;KAAA;;;;;;;;;;"
+}
