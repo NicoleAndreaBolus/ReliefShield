@@ -15,6 +15,7 @@
     "cli": "npx tsx src/cli.ts",
     "check-balance": "npx tsx src/check-balance.ts",
     "network": "npx tsx src/network.ts",
+    "sync:feedback": "node scripts/sync-survey-responses.js",
     "test": "npx vitest run"
   },
   "dependencies": {

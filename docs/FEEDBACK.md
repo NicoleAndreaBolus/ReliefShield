@@ -33,3 +33,10 @@ Feedback was gathered organically across diverse public community channels, incl
 | Enhanced multi-account portfolio balance aggregator | Ensured sub-account balances in Lace are aggregated accurately to $6,000 tNIGHT | `317878a` |
 | Unified Warm Amber & Soft Off-White design system | Improved visual accessibility and trust for humanitarian aid contributors | `876e17a` |
 | Implemented explicit witness constraint validation in `contract.ts` | Prevented invalid or zero-value transactions before computing expensive ZK circuits | `Level 4` |
+
+---
+
+## Associated Feedback Datasets
+- **Live Form Responses CSV**: [docs/ReliefShield (Responses) - Form Responses 1.csv](ReliefShield%20(Responses)%20-%20Form%20Responses%201.csv)
+- **Detailed Participant Dataset**: [docs/user-feedback-responses.csv](user-feedback-responses.csv)
+- **Public Google Sheet**: [Live Google Spreadsheet](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)

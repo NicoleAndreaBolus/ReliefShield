@@ -15,6 +15,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.*-checkpoint.json
+.form-*-checkpoint.json
 .DS_Store
 Thumbs.db
 
