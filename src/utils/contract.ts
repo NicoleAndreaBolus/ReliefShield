@@ -19,7 +19,7 @@ export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
 };
 
 export const PREPROD_CONTRACT_CONFIG: ContractConfig = {
-  contractAddress: '7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2',
+  contractAddress: '2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b',
   network: 'preprod',
   proofServerUrl: 'http://127.0.0.1:6300',
   indexerUrl: 'https://indexer.preprod.midnight.network/api/v4/graphql',

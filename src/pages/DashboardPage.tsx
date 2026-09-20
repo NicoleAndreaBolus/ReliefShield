@@ -25,6 +25,7 @@ import {
   CartesianGrid 
 } from 'recharts';
 import { mockChartData, mockActivities } from '../data/mockData';
+import { PREPROD_CONTRACT_CONFIG } from '../utils/contract';
 
 interface DashboardPageProps {
   onCreateRequest: () => void;
@@ -50,7 +51,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [circuitSuccess, setCircuitSuccess] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const currentContractAddress = '7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2';
+  const currentContractAddress = PREPROD_CONTRACT_CONFIG.contractAddress;
 
   const handleCircuitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

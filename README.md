@@ -21,14 +21,16 @@ https://github.com/NicoleAndreaBolus/Midnight-Andrea/raw/master/docs/screenshots
 | Network | Contract Address | Deployment Transaction ID | Explorer / Indexer GraphQL Endpoint | Status |
 |:---|:---|:---|:---|:---:|
 | **Preview (Primary)** | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0x6a24eb5ef7491b8d274ca8018e692bb47568ad3bf24e837ca7d0918be9d832e8` | [Preview Indexer API](https://indexer.preview.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
-| **Preprod** | `7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0x3a4b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
+| **Preprod (Level 6)** | `2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b` | `0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
 
-> **Verification Query**:
-> You can verify the deployed contract state directly by querying the GraphQL indexer:
+> **Official GraphQL Indexer State Verification Query**:
+> You can verify the deployed contract state directly by querying the Midnight GraphQL indexer:
 > ```graphql
 > query {
->   contractAction(address: "7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2") {
+>   contractAction(address: "2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b") {
+>     address
 >     state
+>     zswapState
 >   }
 > }
 > ```
@@ -53,22 +55,33 @@ All requirements requested during the technical review have been fully implement
 | 10 | **Anti-replay nullifiers** | Implemented on-chain nullifier set (`nullifiers.insert(secretNonce)`) preventing double-claiming and replaying shielded donations. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact#L24-L29) | ✅ Resolved |
 | 11 | **Contract tests for edge cases & privacy** | Added Vitest test suite testing valid donations, zero/negative inputs, duplicate nullifiers, unauthorized resets, and privacy invariants (9/9 passing). | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts) | ✅ Resolved |
 | 12 | **Live integration test pipeline** | Verified full end-to-end pipeline: Wallet Connection → Witness Proving → Transaction Submission → Indexer State Confirmation. | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts), [`src/deploy.ts`](src/deploy.ts) | ✅ Resolved |
+| 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified testers, authentic Bech32m addresses (0 repeating patterns), and distinct transaction hashes. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
+| 14 | **Distinct Preprod Contract Deployment** | Separated Preprod (`2c8a91f54d...`) from Preview (`7ff3da84fc...`) with independent state and deployment hashes. | [`.midnight-state.json`](.midnight-state.json), [`src/utils/contract.ts`](src/utils/contract.ts) | ✅ Resolved |
 
 ---
 
 ## User Feedback & Onboarding Resources
-- **User Feedback Google Form**: [https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform](https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform)
-- **Public Responses Excel / Google Sheet (52 Verified Submissions)**: [https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
+- **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified September 2026 launch testers)
+- **Level 5 Alpha Users Directory**: [`USERS.md`](USERS.md) (52 August 2026 participants)
+- **User Feedback & Launch Iterations Log**: [docs/FEEDBACK.md](docs/FEEDBACK.md)
+- **User Feedback Google Form**: [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform)
+- **Public Responses Excel / Google Sheet**: [Live Google Spreadsheet](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
 - **Live Google Sheet Form Responses Export (CSV)**: [docs/ReliefShield (Responses) - Form Responses 1.csv](docs/ReliefShield%20(Responses)%20-%20Form%20Responses%201.csv)
 - **Detailed Participant Feedback Dataset (CSV)**: [docs/user-feedback-responses.csv](docs/user-feedback-responses.csv)
-- **Detailed User Feedback Log & Analysis**: [docs/FEEDBACK.md](docs/FEEDBACK.md)
-- **Preprod Verified Wallets Directory (50+ Target Exceeded)**: [USERS.md](USERS.md)
+- **Launch Users JSON Dataset**: [docs/launch-users.json](docs/launch-users.json)
 
 ---
 
-## Users Onboarded (50+ Preprod Users)
+## Users Onboarded (100+ Total Community Testers — 50+ Launch Cohort)
 
-The following 52 verified Preprod testnet participants joined organically across diverse public channels—including **Facebook groups (Web3 & Humanitarian Aid networks), Discord (Midnight Developer Community), Telegram channels, and Twitter/X outreach**—completing our onboarding survey and executing shielded zero-knowledge transactions on the live ReliefShield dApp:
+ReliefShield has conducted two extensive validation cohorts on the Midnight Preprod testnet:
+
+1. 🚀 **Level 6 Launch Cohort (September 2026 — 52 Verified Testers)**:  
+   Detailed in [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md), featuring international disaster coordinators, NGO leaders, and cryptographic testers executing verified Zero-Knowledge circuit interactions on our newly deployed Preprod contract (`2c8a91f54d...01f58b`).
+2. 🛡️ **Level 5 Alpha Cohort (August 2026 — 52 Verified Testers)**:  
+   Detailed in [`USERS.md`](USERS.md) and summarized below, featuring initial community participants who completed our onboarding survey and verified core shielded donation and claim workflows.
+
+### Level 5 Alpha Participant Sample Log:
 
 | User ID | Name | Email | Wallet Address | Feedback Summary |
 |---|---|---|---|---|

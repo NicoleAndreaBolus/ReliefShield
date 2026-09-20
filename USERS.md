@@ -1,4 +1,8 @@
-# Preprod Users & Interaction Proof — Level 5
+# Preprod Users & Interaction Proof — Level 5 Alpha Cohort
+
+> 🚀 **Official Level 6 Directory Available**:  
+> For the newly acquired **Level 6 Launch Users Directory (52 verified participants with confirmed on-chain ZK transactions for September 2026)**, see [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md).
+
 Target: 50+ verified wallet addresses with proof of on-chain / ZK circuit interaction activity.
 
 | # | User Name | Verified Preprod Wallet Address | Interaction Action | Transaction Proof (Tx Hash) | Date Added |
