@@ -10,15 +10,29 @@ import { OrganizationsPage } from './pages/OrganizationsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { FieldOfficerPage } from './pages/FieldOfficerPage';
 import { CreateRequestModal } from './components/CreateRequestModal';
 import { TransactionModal } from './components/TransactionModal';
 import { WalletDetailsModal } from './components/WalletDetailsModal';
 import { CircuitExecutionModal } from './components/CircuitExecutionModal';
 import { VerificationSuccessModal, VerificationSuccessData } from './components/VerificationSuccessModal';
 import { Toast } from './components/Toast';
-import { ActiveTab, ReliefRequest, NotificationItem } from './types';
-import { initialRequests, initialNotifications } from './data/seedData';
-import { LayoutDashboard, Globe, ArrowLeftRight } from 'lucide-react';
+import { 
+  ActiveTab, 
+  ReliefRequest, 
+  NotificationItem, 
+  DonationRecord, 
+  DisbursementRecord, 
+  FieldOfficerStation 
+} from './types';
+import { 
+  initialRequests, 
+  initialNotifications, 
+  initialDonations, 
+  initialOfficerStations, 
+  initialDisbursements 
+} from './data/seedData';
+import { LayoutDashboard, Globe, ArrowLeftRight, Truck } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'landing' | 'saas'>('landing');
@@ -28,6 +42,11 @@ export const App: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<ReliefRequest | null>(null);
   const [notificationsList, setNotificationsList] = useState<NotificationItem[]>(initialNotifications);
   
+  // Field Officer, Donations & Disbursements State
+  const [donationsList, setDonationsList] = useState<DonationRecord[]>(initialDonations);
+  const [officerStations, setOfficerStations] = useState<FieldOfficerStation[]>(initialOfficerStations);
+  const [disbursementsList, setDisbursementsList] = useState<DisbursementRecord[]>(initialDisbursements);
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [isWalletDetailsOpen, setIsWalletDetailsOpen] = useState(false);
@@ -56,7 +75,7 @@ export const App: React.FC = () => {
     counterState,
   } = useMidnight();
 
-  const handleExecuteCircuitWithVerification = async (amount: number) => {
+  const handleExecuteCircuitWithVerification = async (amount: number, campaign: string = 'Typhoon Relief') => {
     setExecutingAmount(amount);
     try {
       const result = await executeCircuit(amount);
@@ -66,10 +85,36 @@ export const App: React.FC = () => {
         newPoolBalance: result.newBalance,
       });
       setIsVerificationModalOpen(true);
+
+      // Add to live donations history
+      const newDonation: DonationRecord = {
+        id: `DON-${Math.floor(1000 + Math.random() * 9000)}`,
+        campaign: (campaign as any) || 'Typhoon Relief',
+        amount,
+        donorType: walletAddress ? `Shielded ZK Donor (${walletAddress.slice(0, 8)}...)` : 'Shielded Contributor',
+        timestamp: 'Just now',
+        txHash: result.txHash,
+        status: 'Confirmed On-Chain',
+      };
+      setDonationsList(prev => [newDonation, ...prev]);
+
       return result;
     } catch (err) {
       throw err;
     }
+  };
+
+  const handleDisburseAid = (newDisb: DisbursementRecord) => {
+    setDisbursementsList(prev => [newDisb, ...prev]);
+    setOfficerStations(prev => prev.map(stn => {
+      if (stn.officerName === newDisb.officerName || stn.assignedCategory === newDisb.category) {
+        return {
+          ...stn,
+          currentStock: Math.max(0, stn.currentStock - 1)
+        };
+      }
+      return stn;
+    }));
   };
 
   const handleConnectClick = async () => {
@@ -115,13 +160,29 @@ export const App: React.FC = () => {
         </button>
         
         <button
-          onClick={() => setViewMode('saas')}
+          onClick={() => {
+            setViewMode('saas');
+            if (activeTab === 'field-portal') setActiveTab('dashboard');
+          }}
           className={`px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-2 ${
-            viewMode === 'saas' ? 'bg-blue-600 text-white shadow-md' : 'text-stone-400 hover:text-white'
+            viewMode === 'saas' && activeTab !== 'field-portal' ? 'bg-blue-600 text-white shadow-md' : 'text-stone-400 hover:text-white'
           }`}
         >
           <LayoutDashboard className="w-4 h-4" />
           <span>SaaS Admin</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setViewMode('saas');
+            setActiveTab('field-portal');
+          }}
+          className={`px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-2 ${
+            viewMode === 'saas' && activeTab === 'field-portal' ? 'bg-[#ea580c] text-white shadow-md' : 'text-stone-400 hover:text-white'
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          <span>Field Portal</span>
         </button>
 
         <div className="h-5 w-px bg-stone-800 mx-1" />
@@ -197,6 +258,19 @@ export const App: React.FC = () => {
                   isExecutingCircuit={isExecutingCircuit}
                   lastTxHash={lastTxHash}
                   onExecuteCircuit={handleExecuteCircuitWithVerification}
+                />
+              )}
+
+              {activeTab === 'field-portal' && (
+                <FieldOfficerPage
+                  stations={officerStations}
+                  donations={donationsList}
+                  disbursements={disbursementsList}
+                  counterState={counterState}
+                  isConnected={isConnected}
+                  onExecuteCircuit={handleExecuteCircuitWithVerification}
+                  onDisburseAid={handleDisburseAid}
+                  onShowToast={showToast}
                 />
               )}
 

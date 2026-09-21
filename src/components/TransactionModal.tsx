@@ -19,7 +19,7 @@ interface TransactionModalProps {
   onConnect: () => void;
   counterState: number;
   isExecutingCircuit: boolean;
-  onExecuteCircuit: (amount: number) => Promise<{ txHash: string; newBalance: number }>;
+  onExecuteCircuit: (amount: number, campaign?: string) => Promise<{ txHash: string; newBalance: number }>;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -49,7 +49,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       return;
     }
     try {
-      const res = await onExecuteCircuit(donationAmount);
+      const campaignName = 
+        selectedCampaign === 'typhoon' ? 'Typhoon Relief' :
+        selectedCampaign === 'earthquake' ? 'Earthquake Aid' :
+        selectedCampaign === 'flood' ? 'Flood Recovery' : 'General Emergency Pool';
+
+      const res = await onExecuteCircuit(donationAmount, campaignName);
       setTxHash(res.txHash);
       onClose();
     } catch (err) {

@@ -1,4 +1,12 @@
-import { ReliefRequest, ActivityLog, OrganizationUser, NotificationItem } from '../types';
+import { 
+  ReliefRequest, 
+  ActivityLog, 
+  OrganizationUser, 
+  NotificationItem,
+  DonationRecord,
+  DisbursementRecord,
+  FieldOfficerStation
+} from '../types';
 
 export const initialRequests: ReliefRequest[] = [
   {
@@ -187,6 +195,137 @@ export const initialNotifications: NotificationItem[] = [
     timestamp: 'Yesterday',
     read: true,
     type: 'info'
+  }
+];
+
+export const initialDonations: DonationRecord[] = [
+  {
+    id: 'DON-8841',
+    campaign: 'Typhoon Relief',
+    amount: 500,
+    donorType: 'Shielded ZK Donor #0092',
+    timestamp: '12 minutes ago',
+    txHash: '0x8fd1e88b4ffa0e082a9e02a5c05f78816790118fedbbeefa78032e774aae3bd9',
+    status: 'Confirmed On-Chain',
+  },
+  {
+    id: 'DON-8840',
+    campaign: 'Medical Emergency',
+    amount: 250,
+    donorType: 'Global Health Aid Alliance',
+    timestamp: '35 minutes ago',
+    txHash: '0x788a44d44a02eb7cb6e7cd738d90fe57d022814b8950a0dda74a667b71435ecb',
+    status: 'Confirmed On-Chain',
+  },
+  {
+    id: 'DON-8839',
+    campaign: 'Food & Shelter',
+    amount: 1000,
+    donorType: 'Anonymous Crypto Contributor',
+    timestamp: '2 hours ago',
+    txHash: '0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599',
+    status: 'Confirmed On-Chain',
+  },
+  {
+    id: 'DON-8838',
+    campaign: 'Earthquake Aid',
+    amount: 750,
+    donorType: 'Pacific Humanitarian Foundation',
+    timestamp: '4 hours ago',
+    txHash: '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a',
+    status: 'Confirmed On-Chain',
+  },
+  {
+    id: 'DON-8837',
+    campaign: 'Flood Recovery',
+    amount: 350,
+    donorType: 'Community Disaster Pool',
+    timestamp: '6 hours ago',
+    txHash: '0x3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b',
+    status: 'Confirmed On-Chain',
+  }
+];
+
+export const initialOfficerStations: FieldOfficerStation[] = [
+  {
+    id: 'STN-1',
+    officerName: 'Sarah Jenkins',
+    email: 'sarah.j@reliefshield.org',
+    role: 'Field Distribution Manager',
+    assignedCategory: 'Food & Shelter',
+    stationLocation: 'Evacuation Center Alpha, Cebu',
+    currentStock: 184,
+    maxCapacity: 300,
+    unitLabel: 'Family Food & Water Packs',
+  },
+  {
+    id: 'STN-2',
+    officerName: 'Alex Rivera',
+    email: 'alex.r@auditnet.org',
+    role: 'Medical Response Officer',
+    assignedCategory: 'Medical Emergency',
+    stationLocation: 'Mobile Clinic Hub 2, Bicol Region',
+    currentStock: 95,
+    maxCapacity: 150,
+    unitLabel: 'First Aid & Insulin Kits',
+  },
+  {
+    id: 'STN-3',
+    officerName: 'John Doe',
+    email: 'john.doe@reliefshield.org',
+    role: 'Shelter Logistics Coordinator',
+    assignedCategory: 'Earthquake Aid',
+    stationLocation: 'Disaster Staging Camp #4, Surigao',
+    currentStock: 62,
+    maxCapacity: 100,
+    unitLabel: 'Emergency Tent & Lumber Packs',
+  },
+  {
+    id: 'STN-4',
+    officerName: 'Maria Santos',
+    email: 'm.santos@redcross-chapter.org',
+    role: 'Emergency Rapid Response Coordinator',
+    assignedCategory: 'Typhoon Relief',
+    stationLocation: 'Coastal Disaster Relief Depot, Leyte',
+    currentStock: 140,
+    maxCapacity: 250,
+    unitLabel: 'Typhoon Emergency Survival Kits',
+  }
+];
+
+export const initialDisbursements: DisbursementRecord[] = [
+  {
+    id: 'DISB-501',
+    tokenId: 'ZK-TOKEN #AID-98425',
+    officerName: 'Sarah Jenkins',
+    category: 'Food & Shelter',
+    itemsDisbursed: '1x Family Food Ration & Clean Water Gallon',
+    valueEquivalent: 50,
+    timestamp: '18 minutes ago',
+    location: 'Evacuation Center Alpha, Cebu',
+    status: 'Disbursed',
+  },
+  {
+    id: 'DISB-500',
+    tokenId: 'ZK-TOKEN #AID-98421',
+    officerName: 'Alex Rivera',
+    category: 'Medical Emergency',
+    itemsDisbursed: '2x Emergency Trauma & Wound Dressing Kits',
+    valueEquivalent: 150,
+    timestamp: '45 minutes ago',
+    location: 'Mobile Clinic Hub 2, Bicol Region',
+    status: 'Disbursed',
+  },
+  {
+    id: 'DISB-499',
+    tokenId: 'ZK-TOKEN #AID-98418',
+    officerName: 'John Doe',
+    category: 'Earthquake Aid',
+    itemsDisbursed: '1x Heavy Duty Waterproof Shelter Tarp & Poles',
+    valueEquivalent: 100,
+    timestamp: '2 hours ago',
+    location: 'Disaster Staging Camp #4, Surigao',
+    status: 'Disbursed',
   }
 ];
 

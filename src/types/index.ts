@@ -45,10 +45,52 @@ export interface NotificationItem {
   type: 'info' | 'success' | 'warning';
 }
 
+export type CampaignType = 
+  | 'Typhoon Relief'
+  | 'Earthquake Aid'
+  | 'Flood Recovery'
+  | 'Medical Emergency'
+  | 'Food & Shelter';
+
+export interface DonationRecord {
+  id: string;
+  campaign: CampaignType;
+  amount: number;
+  donorType: string;
+  timestamp: string;
+  txHash: string;
+  status: 'Confirmed On-Chain';
+}
+
+export interface DisbursementRecord {
+  id: string;
+  tokenId: string;
+  officerName: string;
+  category: CampaignType;
+  itemsDisbursed: string;
+  valueEquivalent: number;
+  timestamp: string;
+  location: string;
+  status: 'Disbursed';
+}
+
+export interface FieldOfficerStation {
+  id: string;
+  officerName: string;
+  email: string;
+  role: string;
+  assignedCategory: CampaignType;
+  stationLocation: string;
+  currentStock: number;
+  maxCapacity: number;
+  unitLabel: string;
+}
+
 export type ActiveTab = 
   | 'dashboard'
   | 'requests'
   | 'request-detail'
+  | 'field-portal'
   | 'organizations'
   | 'reports'
   | 'notifications'

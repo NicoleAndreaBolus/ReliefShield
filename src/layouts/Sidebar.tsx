@@ -11,7 +11,9 @@ import {
   LogOut, 
   Shield, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  Radio,
+  Truck
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -32,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'field-portal', label: 'Field Officer Portal', icon: Truck },
     { id: 'requests', label: 'Requests / Cases', icon: FileText },
     { id: 'organizations', label: 'Organizations & Users', icon: Building2 },
     { id: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
