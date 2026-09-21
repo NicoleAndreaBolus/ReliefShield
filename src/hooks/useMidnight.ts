@@ -463,19 +463,33 @@ export function useMidnight() {
 
       // Execute through official Lace connector flow
       if (apiInstance && typeof apiInstance.makeTransfer === 'function') {
-        let tokenType = '0000000000000000000000000000000000000000000000000000000000000000';
-        if (typeof apiInstance.getUnshieldedBalances === 'function') {
-          const bMap = await apiInstance.getUnshieldedBalances();
-          const keys = Object.keys(bMap || {});
-          if (keys.length > 0) tokenType = keys[0];
+        // Query DUST status for diagnostics
+        let dustBalance: bigint | null = null;
+        if (typeof apiInstance.getDustBalance === 'function') {
+          try {
+            const d = await apiInstance.getDustBalance();
+            if (d && typeof d.balance === 'bigint') {
+              dustBalance = d.balance;
+              console.log(`[Lace] Current DUST balance: ${dustBalance.toLocaleString()} (Cap: ${d.cap?.toLocaleString()})`);
+              if (dustBalance === 0n) {
+                console.warn('[Lace] WARNING: Wallet DUST balance is 0. Transactions require DUST to pay network gas fees.');
+              }
+            }
+          } catch (dErr) {
+            console.warn('[Lace] getDustBalance query failed:', dErr);
+          }
         }
 
-        // Ensure destination is a valid Bech32m address
+        // Native NIGHT token type on Midnight is 32 bytes of zeros
+        const tokenType = '0000000000000000000000000000000000000000000000000000000000000000';
+
+        // Ensure destination is the official unshielded address matching active Lace network
         let destination = walletState.walletAddress;
-        if (!destination && typeof apiInstance.getUnshieldedAddress === 'function') {
+        if (typeof apiInstance.getUnshieldedAddress === 'function') {
           try {
             const aRes = await apiInstance.getUnshieldedAddress();
-            destination = aRes?.unshieldedAddress || (typeof aRes === 'string' ? aRes : null);
+            const fresh = aRes?.unshieldedAddress || (typeof aRes === 'string' ? aRes : null);
+            if (fresh) destination = fresh;
           } catch {}
         }
         if (!destination) {
@@ -563,25 +577,42 @@ export function useMidnight() {
       return { txHash: realTxHash, newBalance: updatedPool };
     } catch (err: any) {
       console.error('[ReliefShield ZK] donateShielded error:', err);
+      console.error('[ReliefShield ZK] error details:', {
+        name: err?.name,
+        message: err?.message,
+        reason: err?.reason,
+        code: err?.code,
+        data: err?.data,
+        cause: err?.cause,
+        stack: err?.stack,
+        raw: String(err),
+      });
+
       setIsExecutingCircuit(false);
       setCircuitStage('idle');
       
-      const errMsg = 
+      const rawMsg = 
         err?.reason || 
         err?.message || 
         err?.code || 
-        (typeof err === 'string' ? err : 'Shielded circuit execution failed.');
+        (typeof err === 'string' ? err : '');
 
       const isDeclined = 
-        errMsg.toLowerCase().includes('reject') || 
-        errMsg.toLowerCase().includes('cancel') || 
-        errMsg.toLowerCase().includes('decline') ||
+        rawMsg.toLowerCase().includes('reject') || 
+        rawMsg.toLowerCase().includes('cancel') || 
+        rawMsg.toLowerCase().includes('decline') ||
         err?.code === 'Rejected';
 
       if (isDeclined) {
         throw new Error('Transaction was cancelled by user in Lace wallet.');
       }
-      throw new Error(errMsg);
+
+      let userFriendlyMsg = rawMsg;
+      if (!userFriendlyMsg || userFriendlyMsg === 'Error' || userFriendlyMsg.trim().length === 0) {
+        userFriendlyMsg = 'Transaction rejected by Midnight Lace. Common cause: your wallet requires DUST (gas generated over time from tNIGHT) to balance and pay transaction fees, or the Midnight Preview node was temporarily busy. Please ensure your wallet has accrued DUST and retry.';
+      }
+
+      throw new Error(userFriendlyMsg);
     }
   };
 
