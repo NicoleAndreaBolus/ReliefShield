@@ -25,7 +25,7 @@ import {
   CartesianGrid 
 } from 'recharts';
 import { mockChartData, mockActivities } from '../data/mockData';
-import { PREPROD_CONTRACT_CONFIG } from '../utils/contract';
+import { RELIEF_SHIELD_CONTRACT_CONFIG } from '../utils/contract';
 
 interface DashboardPageProps {
   onCreateRequest: () => void;
@@ -51,7 +51,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [circuitSuccess, setCircuitSuccess] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const currentContractAddress = PREPROD_CONTRACT_CONFIG.contractAddress;
+  const currentContractAddress = RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress;
 
   const handleCircuitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,7 +135,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
-              Midnight Preprod Contract Address
+              Midnight Preview Contract Address
             </span>
             <span className="text-xs text-emerald-700 font-bold flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Deployed & Verified
@@ -146,13 +146,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={() => copyToClipboard(currentContractAddress)}
-          className="px-3.5 py-2 rounded-xl bg-[#FAF8F5] border border-[#EFEBE6] hover:bg-stone-200/60 text-[#1C1917] font-bold text-xs flex items-center gap-1.5 transition-all shrink-0"
-        >
-          {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-          <span>{copied ? 'Copied!' : 'Copy Address'}</span>
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <a
+            href={`https://preview.midnightexplorer.com/contracts/${currentContractAddress}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm shadow-amber-500/20"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>View on Explorer</span>
+          </a>
+
+          <button
+            onClick={() => copyToClipboard(currentContractAddress)}
+            className="px-3.5 py-2 rounded-xl bg-[#FAF8F5] border border-[#EFEBE6] hover:bg-stone-200/60 text-[#1C1917] font-bold text-xs flex items-center gap-1.5 transition-all"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-stone-500" />}
+            <span>{copied ? 'Copied!' : 'Copy Address'}</span>
+          </button>
+        </div>
       </div>
 
       {/* 4 Statistics Cards */}
