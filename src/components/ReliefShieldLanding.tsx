@@ -14,7 +14,8 @@ import {
   Wallet,
   ArrowLeftRight,
   Coins,
-  Check
+  Check,
+  Eye
 } from 'lucide-react';
 
 interface ReliefShieldLandingProps {
@@ -28,6 +29,7 @@ interface ReliefShieldLandingProps {
   onDisconnect: () => void;
   onOpenDashboard: () => void;
   onOpenTxModal: () => void;
+  onOpenWalletDetails?: () => void;
   counterState: number;
   isExecutingCircuit: boolean;
   onExecuteCircuit: (amount: number) => Promise<{ txHash: string; newBalance: number }>;
@@ -44,6 +46,7 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
   onDisconnect,
   onOpenDashboard,
   onOpenTxModal,
+  onOpenWalletDetails,
   counterState,
   isExecutingCircuit,
   onExecuteCircuit,
@@ -106,10 +109,16 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
                   <span>{walletBalance.toLocaleString()} tNIGHT</span>
                 </div>
 
-                {/* Wallet Address Snippet */}
-                <span className="text-xs font-mono font-semibold px-3 py-1.5 rounded-xl bg-amber-100/80 text-amber-900 border border-amber-200">
-                  {truncatedAddress}
-                </span>
+                {/* Wallet Address Snippet (Clickable to view full address) */}
+                <button
+                  type="button"
+                  onClick={onOpenWalletDetails}
+                  title="Click to view full wallet address & details"
+                  className="text-xs font-mono font-semibold px-3 py-1.5 rounded-xl bg-amber-100/80 hover:bg-amber-200/90 text-amber-900 border border-amber-300/70 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 group"
+                >
+                  <Eye className="w-3 h-3 text-amber-700 group-hover:text-amber-950 transition-colors" />
+                  <span>{truncatedAddress}</span>
+                </button>
 
                 <button
                   onClick={onDisconnect}

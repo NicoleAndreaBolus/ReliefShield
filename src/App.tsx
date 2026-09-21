@@ -12,6 +12,7 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { CreateRequestModal } from './components/CreateRequestModal';
 import { TransactionModal } from './components/TransactionModal';
+import { WalletDetailsModal } from './components/WalletDetailsModal';
 import { Toast } from './components/Toast';
 import { ActiveTab, ReliefRequest, NotificationItem } from './types';
 import { initialRequests, initialNotifications } from './data/seedData';
@@ -27,6 +28,7 @@ export const App: React.FC = () => {
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [isWalletDetailsOpen, setIsWalletDetailsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Midnight Lace Wallet & ZK Circuit Hook
@@ -122,6 +124,7 @@ export const App: React.FC = () => {
           onDisconnect={disconnectWallet}
           onOpenDashboard={() => setViewMode('saas')}
           onOpenTxModal={() => setIsTxModalOpen(true)}
+          onOpenWalletDetails={() => setIsWalletDetailsOpen(true)}
           counterState={counterState}
           isExecutingCircuit={isExecutingCircuit}
           onExecuteCircuit={executeCircuit}
@@ -151,6 +154,7 @@ export const App: React.FC = () => {
             onConnect={handleConnectClick}
             onDisconnect={disconnectWallet}
             onOpenNotifications={() => setActiveTab('notifications')}
+            onOpenWalletDetails={() => setIsWalletDetailsOpen(true)}
             unreadCount={unreadNotificationsCount}
           />
 
@@ -230,6 +234,16 @@ export const App: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateRequest}
+      />
+
+      {/* Full Wallet Address & Account Details Modal */}
+      <WalletDetailsModal
+        isOpen={isWalletDetailsOpen}
+        onClose={() => setIsWalletDetailsOpen(false)}
+        walletAddress={walletAddress}
+        walletBalance={walletBalance}
+        network={network}
+        onDisconnect={disconnectWallet}
       />
 
       {/* Error or Status Toast */}

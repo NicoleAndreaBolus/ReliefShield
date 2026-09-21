@@ -7,7 +7,8 @@ import {
   CheckCircle2, 
   ChevronDown, 
   ShieldCheck,
-  Coins 
+  Coins,
+  Eye
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -22,6 +23,7 @@ interface TopNavProps {
   onConnect: () => void;
   onDisconnect: () => void;
   onOpenNotifications: () => void;
+  onOpenWalletDetails?: () => void;
   unreadCount: number;
 }
 
@@ -36,6 +38,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   onConnect,
   onDisconnect,
   onOpenNotifications,
+  onOpenWalletDetails,
   unreadCount,
 }) => {
   const getPageTitle = (tab: ActiveTab) => {
@@ -101,10 +104,16 @@ export const TopNav: React.FC<TopNavProps> = ({
               <span>{walletBalance.toLocaleString()} tNIGHT</span>
             </div>
 
-            <div className="px-3 py-1.5 rounded-xl bg-amber-100/80 border border-amber-200 text-xs font-mono font-semibold text-amber-950 flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onOpenWalletDetails}
+              title="Click to view full wallet address & details"
+              className="px-3 py-1.5 rounded-xl bg-amber-100/80 hover:bg-amber-200/90 border border-amber-300/70 text-xs font-mono font-semibold text-amber-950 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 group"
+            >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>{truncatedAddress}</span>
-            </div>
+              <Eye className="w-3 h-3 text-amber-700 group-hover:text-amber-950 ml-0.5 transition-colors" />
+            </button>
             <button
               onClick={onDisconnect}
               className="text-xs font-semibold text-[#78716C] hover:text-rose-600 px-2 py-1 transition-colors"
