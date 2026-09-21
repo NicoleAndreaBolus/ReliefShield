@@ -51,6 +51,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     try {
       const res = await onExecuteCircuit(donationAmount);
       setTxHash(res.txHash);
+      onClose();
     } catch (err) {
       console.error(err);
     }

@@ -15,7 +15,8 @@ import {
   ArrowLeftRight,
   Coins,
   Check,
-  Eye
+  Eye,
+  ExternalLink
 } from 'lucide-react';
 
 interface ReliefShieldLandingProps {
@@ -270,8 +271,28 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
               </form>
 
               {txResultHash && (
-                <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-[11px] font-mono text-emerald-900 break-all">
-                  ✓ Tx Hash: {txResultHash}
+                <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl space-y-1.5 text-[11px] font-mono text-emerald-900">
+                  <div className="flex items-center justify-between font-sans">
+                    <span className="font-extrabold text-emerald-950 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      ZK Proof Verified & Ledger Updated
+                    </span>
+                    <span className="text-[10px] bg-emerald-100/90 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                      Confirmed
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-emerald-800 break-all">
+                    Tx: {txResultHash}
+                  </p>
+                  <a
+                    href={`https://preview.midnightexplorer.com/transactions/${txResultHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-sans text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline pt-0.5"
+                  >
+                    <span>View on Midnight Explorer</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               )}
             </div>

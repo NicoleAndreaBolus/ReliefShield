@@ -13,6 +13,8 @@ import { SettingsPage } from './pages/SettingsPage';
 import { CreateRequestModal } from './components/CreateRequestModal';
 import { TransactionModal } from './components/TransactionModal';
 import { WalletDetailsModal } from './components/WalletDetailsModal';
+import { CircuitExecutionModal } from './components/CircuitExecutionModal';
+import { VerificationSuccessModal, VerificationSuccessData } from './components/VerificationSuccessModal';
 import { Toast } from './components/Toast';
 import { ActiveTab, ReliefRequest, NotificationItem } from './types';
 import { initialRequests, initialNotifications } from './data/seedData';
@@ -31,6 +33,11 @@ export const App: React.FC = () => {
   const [isWalletDetailsOpen, setIsWalletDetailsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Verification & Circuit Execution Modal States
+  const [verificationData, setVerificationData] = useState<VerificationSuccessData | null>(null);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [executingAmount, setExecutingAmount] = useState<number>(100);
+
   // Midnight Lace Wallet & ZK Circuit Hook
   const {
     isConnected,
@@ -44,9 +51,26 @@ export const App: React.FC = () => {
     disconnectWallet,
     executeCircuit,
     isExecutingCircuit,
+    circuitStage,
     lastTxHash,
     counterState,
   } = useMidnight();
+
+  const handleExecuteCircuitWithVerification = async (amount: number) => {
+    setExecutingAmount(amount);
+    try {
+      const result = await executeCircuit(amount);
+      setVerificationData({
+        txHash: result.txHash,
+        amount,
+        newPoolBalance: result.newBalance,
+      });
+      setIsVerificationModalOpen(true);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  };
 
   const handleConnectClick = async () => {
     try {
@@ -127,7 +151,7 @@ export const App: React.FC = () => {
           onOpenWalletDetails={() => setIsWalletDetailsOpen(true)}
           counterState={counterState}
           isExecutingCircuit={isExecutingCircuit}
-          onExecuteCircuit={executeCircuit}
+          onExecuteCircuit={handleExecuteCircuitWithVerification}
         />
       ) : (
         /* Enterprise SaaS Admin View */
@@ -172,7 +196,7 @@ export const App: React.FC = () => {
                   counterState={counterState}
                   isExecutingCircuit={isExecutingCircuit}
                   lastTxHash={lastTxHash}
-                  onExecuteCircuit={executeCircuit}
+                  onExecuteCircuit={handleExecuteCircuitWithVerification}
                 />
               )}
 
@@ -226,7 +250,7 @@ export const App: React.FC = () => {
         onConnect={handleConnectClick}
         counterState={counterState}
         isExecutingCircuit={isExecutingCircuit}
-        onExecuteCircuit={executeCircuit}
+        onExecuteCircuit={handleExecuteCircuitWithVerification}
       />
 
       {/* Reusable Modals & Toasts */}
@@ -244,6 +268,21 @@ export const App: React.FC = () => {
         walletBalance={walletBalance}
         network={network}
         onDisconnect={disconnectWallet}
+      />
+
+      {/* Live ZK Circuit Execution Progress Modal */}
+      <CircuitExecutionModal
+        isOpen={isExecutingCircuit}
+        stage={circuitStage}
+        amount={executingAmount}
+      />
+
+      {/* Post-Signing On-Chain Verification Success Modal */}
+      <VerificationSuccessModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        data={verificationData}
+        network={network}
       />
 
       {/* Error or Status Toast */}

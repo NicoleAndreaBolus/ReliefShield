@@ -21,6 +21,13 @@ export interface MidnightWalletState {
   error: string | null;
 }
 
+export type CircuitExecutionStage = 
+  | 'idle' 
+  | 'generating_witness' 
+  | 'awaiting_signature' 
+  | 'submitting' 
+  | 'confirmed';
+
 /**
  * Convert specks (10^6) or direct token units to whole tNIGHT
  */
@@ -199,6 +206,7 @@ export function useMidnight() {
   });
 
   const [isExecutingCircuit, setIsExecutingCircuit] = useState(false);
+  const [circuitStage, setCircuitStage] = useState<CircuitExecutionStage>('idle');
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
   const [totalReliefPool, setTotalReliefPool] = useState<number>(42);
   const [apiInstance, setApiInstance] = useState<any>(null);
@@ -432,6 +440,7 @@ export function useMidnight() {
     }
 
     setIsExecutingCircuit(true);
+    setCircuitStage('generating_witness');
 
     try {
       console.log(`[ReliefShield ZK] Executing donateShielded for ${secretAmount} tNIGHT...`);
@@ -445,6 +454,12 @@ export function useMidnight() {
       } else {
         for (let i = 0; i < 32; i++) nullifierBytes[i] = Math.floor(Math.random() * 256);
       }
+
+      // Brief pause to allow the user to observe witness and nullifier generation
+      await new Promise((r) => setTimeout(r, 600));
+
+      // Transition to awaiting signature in Lace wallet
+      setCircuitStage('awaiting_signature');
 
       // Execute through official Lace connector flow
       if (apiInstance && typeof apiInstance.makeTransfer === 'function') {
@@ -468,6 +483,10 @@ export function useMidnight() {
 
         // Triggers the native Lace popup for user approval
         const res = await apiInstance.makeTransfer(desiredOutputs, { payFees: true });
+        
+        // Once approved in Lace, transition to submitting and verifying on Midnight network
+        setCircuitStage('submitting');
+
         if (typeof apiInstance.submitTransaction === 'function' && res?.tx) {
           await apiInstance.submitTransaction(res.tx);
           console.log('[Lace] Real transaction submitted to Midnight network!');
@@ -481,6 +500,8 @@ export function useMidnight() {
       if (!realTxHash) {
         throw new Error('Transaction was not approved by wallet.');
       }
+
+      setCircuitStage('confirmed');
 
       const updatedPool = totalReliefPool + secretAmount;
       setTotalReliefPool(updatedPool);
@@ -506,9 +527,15 @@ export function useMidnight() {
         }
       }, 3000);
 
+      // Reset circuitStage after a moment
+      setTimeout(() => {
+        setCircuitStage('idle');
+      }, 2000);
+
       return { txHash: realTxHash, newBalance: updatedPool };
     } catch (err: any) {
       setIsExecutingCircuit(false);
+      setCircuitStage('idle');
       const isDeclined = 
         err?.message?.toLowerCase().includes('reject') || 
         err?.message?.toLowerCase().includes('cancel') ||
@@ -528,6 +555,7 @@ export function useMidnight() {
     donateShielded,
     executeCircuit: donateShielded, // Backward compatible alias for components
     isExecutingCircuit,
+    circuitStage,
     lastTxHash,
     totalReliefPool,
     counterState: totalReliefPool, // Backward compatible alias
