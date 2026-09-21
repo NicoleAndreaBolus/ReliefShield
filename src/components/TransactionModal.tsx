@@ -190,12 +190,20 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               </button>
 
               {txHash && (
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-1 text-emerald-900 font-mono break-all">
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-2 text-emerald-900 font-mono break-all">
                   <div className="flex items-center gap-1.5 font-bold text-emerald-800">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Transaction Confirmed On-Chain</span>
                   </div>
-                  <p>Hash: {txHash}</p>
+                  <p className="text-[11px] text-emerald-950">Hash: {txHash}</p>
+                  <a
+                    href={`https://preview.midnightexplorer.com/transactions/${txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 underline pt-1"
+                  >
+                    <span>View on Midnight Explorer →</span>
+                  </a>
                 </div>
               )}
             </form>
