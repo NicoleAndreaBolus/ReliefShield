@@ -24,7 +24,7 @@ import {
   Tooltip, 
   CartesianGrid 
 } from 'recharts';
-import { mockChartData, mockActivities } from '../data/mockData';
+import { initialChartData, initialActivities } from '../data/seedData';
 import { RELIEF_SHIELD_CONTRACT_CONFIG } from '../utils/contract';
 
 interface DashboardPageProps {
@@ -218,7 +218,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
           <div className="h-64 pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={mockChartData}>
+              <AreaChart data={initialChartData}>
                 <defs>
                   <linearGradient id="colorReq" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#ea580c" stopOpacity={0.3}/>
@@ -319,7 +319,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         <div className="divide-y divide-[#EFEBE6]">
-          {mockActivities.map((act) => (
+          {initialActivities.map((act) => (
             <div key={act.id} className="py-3.5 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <img

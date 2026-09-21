@@ -14,16 +14,16 @@ import { CreateRequestModal } from './components/CreateRequestModal';
 import { TransactionModal } from './components/TransactionModal';
 import { Toast } from './components/Toast';
 import { ActiveTab, ReliefRequest, NotificationItem } from './types';
-import { mockRequests, mockNotifications } from './data/mockData';
+import { initialRequests, initialNotifications } from './data/seedData';
 import { LayoutDashboard, Globe, ArrowLeftRight } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'landing' | 'saas'>('landing');
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [requestsList, setRequestsList] = useState<ReliefRequest[]>(mockRequests);
+  const [requestsList, setRequestsList] = useState<ReliefRequest[]>(initialRequests);
   const [selectedRequest, setSelectedRequest] = useState<ReliefRequest | null>(null);
-  const [notificationsList, setNotificationsList] = useState<NotificationItem[]>(mockNotifications);
+  const [notificationsList, setNotificationsList] = useState<NotificationItem[]>(initialNotifications);
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);

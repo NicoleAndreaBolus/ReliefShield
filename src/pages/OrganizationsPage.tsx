@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Building2, Search, Plus, UserCheck, Shield } from 'lucide-react';
-import { mockUsers } from '../data/mockData';
+import { initialUsers } from '../data/seedData';
 
 export const OrganizationsPage: React.FC = () => {
   const [search, setSearch] = useState('');
 
-  const filteredUsers = mockUsers.filter(u => 
+  const filteredUsers = initialUsers.filter(u => 
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.organization.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
