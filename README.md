@@ -19,16 +19,12 @@ https://github.com/NicoleAndreaBolus/Midnight-Andrea/raw/master/docs/screenshots
 
 ## Deployed Contract & Network Verification
 
-ReliefShield is deployed and verified on the **Midnight Preview Testnet**, the primary network environment for Midnight DApps, Lace Wallet connectivity, and smart contract execution.
+ReliefShield is deployed and verified on the Midnight Network, supporting both **Midnight Preview** (primary network environment for Midnight DApps and Lace Wallet connectivity) and **Midnight Preprod** (Level 6 release candidate environment).
 
-| Detail | Verification Record | Link / Explorer |
-|:---|:---|:---:|
-| **Network** | Midnight Preview Testnet (Primary) | [Preview Network Status](https://indexer.preview.midnight.network/api/v4/graphql) |
-| **Contract Address** | `0x7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | [**View on Midnight Explorer**](https://preview.midnightexplorer.com/contracts/7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2) |
-| **Deployment Tx Hash** | `0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599` | [**View Deployment Tx**](https://preview.midnightexplorer.com/transactions/0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599) |
-| **Block Height** | Block `#405,613` | Verified On-Chain |
-| **Contract Status** | Active (ZSwap Ledger State `midnight:zswap-ledger-state[v5]`) | ✅ Verified On-Chain |
-| **GraphQL Indexer** | `https://indexer.preview.midnight.network/api/v4/graphql` | [GraphQL API](https://indexer.preview.midnight.network/api/v4/graphql) |
+| Network Environment | Contract Address | Deployment Transaction ID | Explorer / Indexer Endpoint | Deployment Status |
+|:---|:---|:---|:---|:---:|
+| **Midnight Preview (Primary Live DApp)** | `0x7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599` | [**View on Preview Explorer**](https://preview.midnightexplorer.com/contracts/7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2) | ✅ Verified On-Chain (`#405,613`) |
+| **Midnight Preprod (Level 6 Staging)** | `0x2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b` | `0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
 
 > **Official GraphQL Indexer State Verification Query**:
 > You can verify the deployed contract state directly by querying the Midnight GraphQL indexer:
