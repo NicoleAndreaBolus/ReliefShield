@@ -1,5 +1,10 @@
 # User Feedback & Launch Iterations — Level 6
 
+> [!IMPORTANT]
+> **Mandatory User Feedback Google Sheet (Level 5 & Level 6)**:  
+> 📊 **[Click Here to Open Live User Feedback Google Sheet](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)**  
+> In full compliance with Level 5 & Level 6 submission requirements, all user survey feedback, usability ratings, and feature requests are tracked and managed in this centralized Google Sheet.
+
 ## Feedback Collection & Launch Testing Methodology
 Feedback and live testing validation were gathered across two comprehensive phases:
 1. **Level 5 Alpha Phase (August 2026)**: Community feedback gathered across Web3 humanitarian networks, Discord, Telegram, and Twitter/X testing sessions.
