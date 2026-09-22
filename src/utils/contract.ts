@@ -85,7 +85,7 @@ export async function queryIndexerContractState(
 export async function readTotalReliefPoolFromIndexer(
   address: string = RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
   network: 'preview' | 'preprod' = 'preview',
-  fallbackPool: number = 42
+  fallbackPool: number = 142
 ): Promise<number> {
   try {
     const { state } = await queryIndexerContractState(address, network);

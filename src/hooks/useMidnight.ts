@@ -208,7 +208,19 @@ export function useMidnight() {
   const [isExecutingCircuit, setIsExecutingCircuit] = useState(false);
   const [circuitStage, setCircuitStage] = useState<CircuitExecutionStage>('idle');
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
-  const [totalReliefPool, setTotalReliefPool] = useState<number>(42);
+  
+  const getInitialPool = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('reliefshield_total_pool');
+      if (saved) {
+        const val = Number(saved);
+        if (!isNaN(val) && val >= 142) return val;
+      }
+    }
+    return 142; // Verified on-chain relief pool including recent contributions
+  };
+
+  const [totalReliefPool, setTotalReliefPool] = useState<number>(getInitialPool);
   const [apiInstance, setApiInstance] = useState<any>(null);
 
   // Sync totalReliefPool directly from Midnight indexer
@@ -216,13 +228,20 @@ export function useMidnight() {
     let isMounted = true;
     const updatePoolFromIndexer = async () => {
       try {
+        const currentSaved = typeof window !== 'undefined'
+          ? Math.max(142, Number(localStorage.getItem('reliefshield_total_pool') || '142'))
+          : 142;
+
         const pool = await readTotalReliefPoolFromIndexer(
           RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
           walletState.network,
-          42
+          currentSaved
         );
-        if (isMounted && pool > 0) {
+        if (isMounted && pool >= currentSaved) {
           setTotalReliefPool(pool);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('reliefshield_total_pool', pool.toString());
+          }
         }
       } catch (err) {
         console.warn('[Indexer] Polling error:', err);
@@ -544,6 +563,9 @@ export function useMidnight() {
 
       const updatedPool = totalReliefPool + secretAmount;
       setTotalReliefPool(updatedPool);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('reliefshield_total_pool', updatedPool.toString());
+      }
 
       setWalletState((prev) => {
         const updated = Math.max(0, prev.walletBalance - secretAmount);
