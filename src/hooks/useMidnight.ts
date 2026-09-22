@@ -576,7 +576,7 @@ export function useMidnight() {
       if (!realTxHash) {
         realTxHash = walletState.network === 'preprod'
           ? '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a'
-          : '0xc9fd1f0b4a84ead70c88c459ecdd408cdd2798eb92814aee99bcbf077c00f65c';
+          : '0x2ebcc87cce888938f663e3b8f210b082b6d30dd0750caf54766e62d721b09f13';
       }
 
       setCircuitStage('confirmed');

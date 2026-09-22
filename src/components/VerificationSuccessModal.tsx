@@ -31,17 +31,21 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
   network = 'preview',
 }) => {
   const [copied, setCopied] = useState(false);
+  const [customHash, setCustomHash] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!isOpen || !data) return null;
 
+  const effectiveHash = (customHash.trim() || data.txHash || '').trim();
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(data.txHash);
+      await navigator.clipboard.writeText(effectiveHash);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
       const el = document.createElement('textarea');
-      el.value = data.txHash;
+      el.value = effectiveHash;
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -51,7 +55,7 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
     }
   };
 
-  const cleanHash = data.txHash ? data.txHash.replace(/^0x/, '') : '';
+  const cleanHash = effectiveHash ? effectiveHash.replace(/^0x/, '') : '';
   const explorerUrl = `https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/transactions/${cleanHash}`;
 
   return (
@@ -143,33 +147,57 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs font-bold text-[#78716C]">
               <span>Transaction Hash (Midnight Network)</span>
-              <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                Confirmed
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="text-[10px] text-[#ea580c] hover:underline font-semibold"
+                >
+                  {isEditing ? 'Done editing' : 'Paste Lace Tx Hash'}
+                </button>
+                <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Confirmed
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 p-3 bg-[#FAF8F5] border border-[#EFEBE6] rounded-2xl">
-              <code className="text-xs font-mono font-bold text-[#1C1917] truncate flex-1 select-all">
-                {data.txHash}
-              </code>
-              <button
-                onClick={handleCopy}
-                className="p-2 rounded-xl bg-white hover:bg-stone-200/60 border border-[#EFEBE6] text-stone-600 hover:text-stone-900 transition-all flex items-center gap-1 text-xs font-bold shrink-0"
-                title="Copy Transaction Hash"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-700">Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5 text-stone-500" />
-                    <span>Copy</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {isEditing ? (
+              <div className="space-y-1.5">
+                <input
+                  type="text"
+                  placeholder="Paste 0x... from Lace Activity tab"
+                  value={customHash}
+                  onChange={(e) => setCustomHash(e.target.value)}
+                  className="w-full text-xs font-mono p-3 bg-[#FAF8F5] border border-[#ea580c] rounded-2xl text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#ea580c]/30"
+                />
+                <p className="text-[10px] text-[#78716C]">
+                  Tip: Copy the Transaction ID from your Lace wallet's Activity tab to view this exact transaction on Explorer.
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 p-3 bg-[#FAF8F5] border border-[#EFEBE6] rounded-2xl">
+                <code className="text-xs font-mono font-bold text-[#1C1917] truncate flex-1 select-all">
+                  {effectiveHash}
+                </code>
+                <button
+                  onClick={handleCopy}
+                  className="p-2 rounded-xl bg-white hover:bg-stone-200/60 border border-[#EFEBE6] text-stone-600 hover:text-stone-900 transition-all flex items-center gap-1 text-xs font-bold shrink-0"
+                  title="Copy Transaction Hash"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-stone-500" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
