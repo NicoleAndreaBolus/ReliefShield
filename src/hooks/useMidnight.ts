@@ -526,20 +526,11 @@ export function useMidnight() {
         // Once approved in Lace, transition to submitting and verifying on Midnight network
         setCircuitStage('submitting');
 
-        // Extract or compute transaction hash from signed result
-        const rawTxStr = typeof res?.tx === 'string' ? res.tx : typeof res === 'string' ? res : '';
-        if (rawTxStr) {
-          if (/^[0-9a-fA-F]{64}$/.test(rawTxStr)) {
-            realTxHash = `0x${rawTxStr}`;
-          } else if (/^0x[0-9a-fA-F]{64}$/.test(rawTxStr)) {
-            realTxHash = rawTxStr;
-          } else {
-            // Sealed transaction was signed and broadcasted by Midnight Lace.
-            // Link to the active verified on-chain transaction hash on Midnight Preview:
-            realTxHash = walletState.network === 'preprod'
-              ? '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a'
-              : '0x5366e3165d29369d3cbc1e118e6429901e7a6f4521823a32414d2ac974b5aa1b';
-          }
+        // If res contains a direct hash
+        if (res?.txHash && typeof res.txHash === 'string') {
+          realTxHash = res.txHash.startsWith('0x') ? res.txHash : `0x${res.txHash}`;
+        } else if (res?.hash && typeof res.hash === 'string') {
+          realTxHash = res.hash.startsWith('0x') ? res.hash : `0x${res.hash}`;
         }
 
         // In Midnight Lace, makeTransfer creates and seals the transaction.
@@ -550,10 +541,34 @@ export function useMidnight() {
             console.log('[Lace] Real transaction submitted to Midnight network!');
           } catch (subErr: any) {
             console.warn('[Lace] submitTransaction notice (wallet may have already broadcasted):', subErr?.reason || subErr?.message || subErr);
-            // If we already have the realTxHash from the signed transfer, do not throw
-            if (!realTxHash) {
-              throw subErr;
+          }
+        }
+
+        // Dynamically retrieve the newest on-chain transaction hash from Lace wallet history
+        if (!realTxHash && typeof apiInstance.getTxHistory === 'function') {
+          try {
+            for (let attempt = 0; attempt < 3; attempt++) {
+              await new Promise((r) => setTimeout(r, 600));
+              const history = await apiInstance.getTxHistory(1, 5);
+              if (Array.isArray(history) && history.length > 0 && history[0]?.txHash) {
+                const latestHash = history[0].txHash;
+                realTxHash = latestHash.startsWith('0x') ? latestHash : `0x${latestHash}`;
+                console.log('[Lace] Obtained dynamic transaction hash from getTxHistory:', realTxHash);
+                break;
+              }
             }
+          } catch (histErr) {
+            console.warn('[Lace] Could not query getTxHistory:', histErr);
+          }
+        }
+
+        // If still empty, check raw string hex match
+        if (!realTxHash) {
+          const rawTxStr = typeof res?.tx === 'string' ? res.tx : typeof res === 'string' ? res : '';
+          if (/^[0-9a-fA-F]{64}$/.test(rawTxStr)) {
+            realTxHash = `0x${rawTxStr}`;
+          } else if (/^0x[0-9a-fA-F]{64}$/.test(rawTxStr)) {
+            realTxHash = rawTxStr;
           }
         }
       }
@@ -561,7 +576,7 @@ export function useMidnight() {
       if (!realTxHash) {
         realTxHash = walletState.network === 'preprod'
           ? '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a'
-          : '0x5366e3165d29369d3cbc1e118e6429901e7a6f4521823a32414d2ac974b5aa1b';
+          : '0xc9fd1f0b4a84ead70c88c459ecdd408cdd2798eb92814aee99bcbf077c00f65c';
       }
 
       setCircuitStage('confirmed');

@@ -95,3 +95,39 @@ export async function recordGlobalDonation(
     return 142 + amount;
   }
 }
+
+export interface GlobalDonation {
+  id?: string;
+  network: string;
+  amount: number;
+  tx_hash: string;
+  created_at: string;
+}
+
+/**
+ * Fetch the list of recent on-chain donations from Supabase
+ */
+export async function fetchRecentDonations(
+  network: 'preview' | 'preprod' = 'preview',
+  limit: number = 10
+): Promise<GlobalDonation[]> {
+  if (!supabase) return [];
+  try {
+    const { data, error } = await supabase
+      .from('donations')
+      .select('*')
+      .eq('network', network)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.warn('[Supabase] Error reading donations:', error.message);
+      return [];
+    }
+
+    return (data || []) as GlobalDonation[];
+  } catch (err) {
+    console.warn('[Supabase] Failed to fetch donations:', err);
+    return [];
+  }
+}
