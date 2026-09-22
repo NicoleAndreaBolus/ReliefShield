@@ -9,6 +9,7 @@ node_modules/
 .midnight-state.json
 .midnight-wallet-state
 .midnight-seed
+midnight-level-db/
 
 # Logs & Temporary files
 *.log

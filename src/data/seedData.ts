@@ -223,7 +223,7 @@ export const initialDonations: DonationRecord[] = [
     amount: 1000,
     donorType: 'Anonymous Crypto Contributor',
     timestamp: '2 hours ago',
-    txHash: '0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599',
+    txHash: '0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1',
     status: 'Confirmed On-Chain',
   },
   {

@@ -21,9 +21,9 @@ let md = `# Level 6 Launch Users & Preview Verification Directory
 Target Requirement: 50+ newly acquired, verified testnet participants who actively tested and executed Zero-Knowledge circuit interactions on the live ReliefShield Midnight Preview deployment.
 
 > **Network**: Midnight Preview Testnet (Primary Production Testnet)  
-> **Contract Address (Preview)**: [\`0x7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2\`](https://preview.midnightexplorer.com/contracts/0x7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2)  
-> **Deployment Tx Hash**: [\`0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599\`](https://preview.midnightexplorer.com/transactions/0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599)  
-> **Block Height**: Block \`#405,613\`  
+> **Contract Address (Preview)**: [\`0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a\`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a)  
+> **Deployment Tx Hash**: [\`0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1\`](https://preview.midnightexplorer.com/transactions/e4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1)  
+> **Block Height**: Block \`#977,195\` (Deployed September 22, 2026)  
 > **GraphQL Indexer Endpoint**: \`https://indexer.preview.midnight.network/api/v4/graphql\`  
 > **Testing Window**: September 10 – September 21, 2026 (Level 6 Production Launch Validation)  
 > **Cohort Size**: 52 Verified Launch Testers (Exceeds 50+ Target)

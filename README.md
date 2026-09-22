@@ -25,14 +25,14 @@ ReliefShield is deployed and verified on the Midnight Network, supporting both *
 
 | Network Environment | Contract Address | Deployment Transaction ID | Explorer / Indexer Endpoint | Deployment Status |
 |:---|:---|:---|:---|:---:|
-| **Midnight Preview (Primary Live DApp)** | `0x7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2` | `0xbd81a3479b91b4b29c0a676a5daac6b5fa2a9f4923fe2b6334f557c7819ed599` | [**View on Preview Explorer**](https://preview.midnightexplorer.com/contracts/7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2) | ✅ Verified On-Chain (`#405,613`) |
+| **Midnight Preview (Primary Live DApp)** | `0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a` | `0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1` | [**View on Preview Explorer**](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | ✅ Verified On-Chain (`#977,195` - Sep 22, 2026) |
 | **Midnight Preprod (Level 6 Staging)** | `0x2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b` | `0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
 
 > **Official GraphQL Indexer State Verification Query**:
 > You can verify the deployed contract state directly by querying the Midnight GraphQL indexer:
 > ```graphql
 > query {
->   contractAction(address: "7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2") {
+>   contractAction(address: "9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a") {
 >     address
 >     state
 >     zswapState

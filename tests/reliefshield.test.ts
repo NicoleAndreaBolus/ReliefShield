@@ -209,7 +209,7 @@ describe('ReliefShield Compact Smart Contract Circuits', () => {
 
       // Step D: Indexer Public Data Confirmation
       const mockQueryIndexer = vi.fn().mockResolvedValue({
-        contractAddress: '7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2',
+        contractAddress: '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a',
         totalReliefPool: 142n,
         lastTransactionId: txResult.txId,
       });

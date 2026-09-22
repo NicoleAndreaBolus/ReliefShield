@@ -12,7 +12,7 @@ export interface ContractConfig {
 }
 
 export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
-  contractAddress: '7ff3da84fceba28bdae68fa8ada604e45bbe191f938873b34857773e1c1e8ec2',
+  contractAddress: '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a',
   network: 'preview',
   proofServerUrl: 'http://127.0.0.1:6300',
   indexerUrl: 'https://indexer.preview.midnight.network/api/v4/graphql',
