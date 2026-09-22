@@ -513,11 +513,24 @@ export function useMidnight() {
         // Once approved in Lace, transition to submitting and verifying on Midnight network
         setCircuitStage('submitting');
 
-        // Extract transaction hash immediately from signed result
-        if (typeof res?.tx === 'string') {
-          realTxHash = res.tx.startsWith('0x') ? res.tx.slice(0, 66) : `0x${res.tx.slice(0, 64)}`;
-        } else if (typeof res === 'string') {
-          realTxHash = (res as string).startsWith('0x') ? (res as string).slice(0, 66) : `0x${(res as string).slice(0, 64)}`;
+        // Extract or compute transaction hash from signed result
+        const rawTxStr = typeof res?.tx === 'string' ? res.tx : typeof res === 'string' ? res : '';
+        if (rawTxStr) {
+          if (/^[0-9a-fA-F]{64}$/.test(rawTxStr)) {
+            realTxHash = `0x${rawTxStr}`;
+          } else if (/^0x[0-9a-fA-F]{64}$/.test(rawTxStr)) {
+            realTxHash = rawTxStr;
+          } else {
+            // Raw serialized transaction string (e.g. 'midnight:transaction[v9]...' or its hex)
+            // Compute SHA-256 hash to produce standard 32-byte transaction identifier
+            try {
+              const encoder = new TextEncoder();
+              const hashBuf = await crypto.subtle.digest('SHA-256', encoder.encode(rawTxStr));
+              realTxHash = '0x' + Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch {
+              realTxHash = rawTxStr.startsWith('0x') ? rawTxStr.slice(0, 66) : `0x${rawTxStr.slice(0, 64)}`;
+            }
+          }
         }
 
         // In Midnight Lace, makeTransfer creates and seals the transaction.

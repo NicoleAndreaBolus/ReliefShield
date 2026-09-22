@@ -51,7 +51,8 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
     }
   };
 
-  const explorerUrl = `https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/transactions/${data.txHash}`;
+  const cleanHash = data.txHash ? data.txHash.replace(/^0x/, '') : '';
+  const explorerUrl = `https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/transactions/${cleanHash}`;
 
   return (
     <div className="fixed inset-0 z-[110] bg-[#1C1917]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">
