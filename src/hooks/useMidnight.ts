@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { readTotalReliefPoolFromIndexer, RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from '../utils/contract';
+import { fetchGlobalReliefPool, recordGlobalDonation } from '../utils/supabase';
 
 /**
  * Custom Hook for Midnight Lace Wallet Connection & ReliefShield ZK Circuit Execution
@@ -232,19 +233,23 @@ export function useMidnight() {
           ? Math.max(142, Number(localStorage.getItem('reliefshield_total_pool') || '142'))
           : 142;
 
+        // Fetch global pool from Supabase PostgreSQL (shared across all devices/users)
+        const globalPool = await fetchGlobalReliefPool(walletState.network, currentSaved);
+
         const pool = await readTotalReliefPoolFromIndexer(
           RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
           walletState.network,
-          currentSaved
+          globalPool
         );
-        if (isMounted && pool >= currentSaved) {
-          setTotalReliefPool(pool);
+        const resolved = Math.max(globalPool, pool);
+        if (isMounted && resolved >= currentSaved) {
+          setTotalReliefPool(resolved);
           if (typeof window !== 'undefined') {
-            localStorage.setItem('reliefshield_total_pool', pool.toString());
+            localStorage.setItem('reliefshield_total_pool', resolved.toString());
           }
         }
       } catch (err) {
-        console.warn('[Indexer] Polling error:', err);
+        console.warn('[Indexer/Supabase] Polling error:', err);
       }
     };
 
@@ -566,6 +571,11 @@ export function useMidnight() {
       if (typeof window !== 'undefined') {
         localStorage.setItem('reliefshield_total_pool', updatedPool.toString());
       }
+
+      // Persist donation and pool globally in Supabase PostgreSQL
+      recordGlobalDonation(walletState.network, secretAmount, realTxHash).catch((err) => {
+        console.warn('[Supabase] Background record donation warning:', err);
+      });
 
       setWalletState((prev) => {
         const updated = Math.max(0, prev.walletBalance - secretAmount);
