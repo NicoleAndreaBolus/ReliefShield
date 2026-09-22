@@ -122,3 +122,102 @@ export function validateWitnessConstraints(
   }
   return { valid: true };
 }
+
+/**
+ * Fetch the current tip block height from the Midnight GraphQL Indexer
+ */
+export async function getCurrentBlockHeight(
+  network: 'preview' | 'preprod' = 'preview'
+): Promise<number> {
+  const indexerEndpoint = network === 'preview' 
+    ? RELIEF_SHIELD_CONTRACT_CONFIG.indexerUrl 
+    : PREPROD_CONTRACT_CONFIG.indexerUrl;
+  try {
+    const res = await fetch(indexerEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: '{ block { height } }' })
+    });
+    const json = await res.json();
+    return json?.data?.block?.height || 0;
+  } catch (err) {
+    console.warn('[Indexer] Could not fetch current block height:', err);
+    return 0;
+  }
+}
+
+/**
+ * Automatically detect an on-chain donation by querying recent blocks on the Midnight Indexer.
+ * Matches when CreatedOutputs contains the treasury address with the expected donation amount.
+ */
+export async function detectLatestOnChainDonation(
+  treasuryAddress: string,
+  amountTokens: number,
+  startHeight?: number,
+  network: 'preview' | 'preprod' = 'preview',
+  maxPollAttempts: number = 6
+): Promise<{ hash: string; blockHeight: number } | null> {
+  const indexerEndpoint = network === 'preview' 
+    ? RELIEF_SHIELD_CONTRACT_CONFIG.indexerUrl 
+    : PREPROD_CONTRACT_CONFIG.indexerUrl;
+  
+  const expectedMicroUnits = String(Math.round(amountTokens * 1_000_000));
+
+  try {
+    let currentTip = startHeight || await getCurrentBlockHeight(network);
+    if (!currentTip) return null;
+
+    const minHeight = Math.max(1, currentTip - 2);
+
+    for (let attempt = 0; attempt < maxPollAttempts; attempt++) {
+      const latestTip = (await getCurrentBlockHeight(network)) || currentTip;
+
+      // Scan from newest block back to minHeight
+      for (let h = latestTip; h >= minHeight; h--) {
+        const blkRes = await fetch(indexerEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              query {
+                block(offset: { height: ${h} }) {
+                  height
+                  transactions {
+                    hash
+                    ... on RegularTransaction {
+                      unshieldedCreatedOutputs {
+                        owner
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            `
+          })
+        });
+        const blkJson = await blkRes.json();
+        const txs = blkJson.data?.block?.transactions || [];
+        for (const tx of txs) {
+          const match = (tx.unshieldedCreatedOutputs || []).some(
+            (out: any) => out.owner === treasuryAddress && out.value === expectedMicroUnits
+          );
+          if (match) {
+            const cleanHash = tx.hash.startsWith('0x') ? tx.hash : `0x${tx.hash}`;
+            return { hash: cleanHash, blockHeight: h };
+          }
+        }
+      }
+
+      // Wait 2.5s before checking the next block if not found yet
+      if (attempt < maxPollAttempts - 1) {
+        await new Promise((r) => setTimeout(r, 2500));
+      }
+    }
+
+    return null;
+  } catch (err) {
+    console.warn('[AutoDetector] Failed to detect on-chain donation:', err);
+    return null;
+  }
+}

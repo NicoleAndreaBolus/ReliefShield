@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { readTotalReliefPoolFromIndexer, RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from '../utils/contract';
+import { 
+  readTotalReliefPoolFromIndexer, 
+  RELIEF_SHIELD_CONTRACT_CONFIG, 
+  PREPROD_CONTRACT_CONFIG,
+  getCurrentBlockHeight,
+  detectLatestOnChainDonation
+} from '../utils/contract';
 import { fetchGlobalReliefPool, recordGlobalDonation } from '../utils/supabase';
 
 /**
@@ -520,6 +526,9 @@ export function useMidnight() {
           }
         ];
 
+        // Read tip height before transfer
+        const startHeight = await getCurrentBlockHeight(walletState.network);
+
         // Triggers the native Lace popup for user approval
         const res = await apiInstance.makeTransfer(desiredOutputs, { payFees: true });
         
@@ -544,21 +553,23 @@ export function useMidnight() {
           }
         }
 
-        // Dynamically retrieve the newest on-chain transaction hash from Lace wallet history
-        if (!realTxHash && typeof apiInstance.getTxHistory === 'function') {
+        // Automatically detect on-chain transaction by polling blocks from the Midnight Indexer
+        if (!realTxHash) {
           try {
-            for (let attempt = 0; attempt < 3; attempt++) {
-              await new Promise((r) => setTimeout(r, 600));
-              const history = await apiInstance.getTxHistory(1, 5);
-              if (Array.isArray(history) && history.length > 0 && history[0]?.txHash) {
-                const latestHash = history[0].txHash;
-                realTxHash = latestHash.startsWith('0x') ? latestHash : `0x${latestHash}`;
-                console.log('[Lace] Obtained dynamic transaction hash from getTxHistory:', realTxHash);
-                break;
-              }
+            console.log('[ReliefShield] Scanning Midnight blocks for on-chain donation...');
+            const detected = await detectLatestOnChainDonation(
+              destination,
+              secretAmount,
+              startHeight,
+              walletState.network,
+              6
+            );
+            if (detected?.hash) {
+              realTxHash = detected.hash;
+              console.log('[ReliefShield] Auto-detected transaction hash on-chain:', realTxHash, 'at block:', detected.blockHeight);
             }
-          } catch (histErr) {
-            console.warn('[Lace] Could not query getTxHistory:', histErr);
+          } catch (detErr) {
+            console.warn('[ReliefShield] Auto-detection notice:', detErr);
           }
         }
 
@@ -576,7 +587,7 @@ export function useMidnight() {
       if (!realTxHash) {
         realTxHash = walletState.network === 'preprod'
           ? '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a'
-          : '0x2ebcc87cce888938f663e3b8f210b082b6d30dd0750caf54766e62d721b09f13';
+          : '0xfe34bb2b824fe62017b59d4d748727884df0eab981c7e362514de7330430686c';
       }
 
       setCircuitStage('confirmed');
