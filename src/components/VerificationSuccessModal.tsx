@@ -180,7 +180,7 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
               rel="noopener noreferrer"
               className="py-3.5 px-5 rounded-2xl bg-white hover:bg-[#FAF8F5] border border-[#EFEBE6] text-[#1C1917] font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98]"
             >
-              <span>View on Explorer</span>
+              <span>View Transaction on Explorer</span>
               <ExternalLink className="w-4 h-4 text-[#ea580c]" />
             </a>
 
@@ -191,6 +191,18 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
               <span>Done</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+          </div>
+
+          <div className="text-center pt-1">
+            <a
+              href={`https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-bold text-[#78716C] hover:text-[#ea580c] transition-colors inline-flex items-center gap-1"
+            >
+              <span>View ReliefShield Smart Contract on Explorer</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
 
         </div>
