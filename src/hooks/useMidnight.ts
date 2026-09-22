@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { readTotalReliefPoolFromIndexer, RELIEF_SHIELD_CONTRACT_CONFIG } from '../utils/contract';
+import { readTotalReliefPoolFromIndexer, RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from '../utils/contract';
 
 /**
  * Custom Hook for Midnight Lace Wallet Connection & ReliefShield ZK Circuit Execution
@@ -483,20 +483,9 @@ export function useMidnight() {
         // Native NIGHT token type on Midnight is 32 bytes of zeros
         const tokenType = '0000000000000000000000000000000000000000000000000000000000000000';
 
-        // Ensure destination is the official unshielded address matching active Lace network
-        let destination = walletState.walletAddress;
-        if (typeof apiInstance.getUnshieldedAddress === 'function') {
-          try {
-            const aRes = await apiInstance.getUnshieldedAddress();
-            const fresh = aRes?.unshieldedAddress || (typeof aRes === 'string' ? aRes : null);
-            if (fresh) destination = fresh;
-          } catch {}
-        }
-        if (!destination) {
-          destination = walletState.network === 'preprod'
-            ? 'mn_addr_preprod1cd6qr5lreezhv2e3wp58naz7wspu452lsyv2mns2ydpepczr3v7qpaswh0'
-            : 'mn_addr_preview1cd6qr5lreezhv2e3wp58naz7wspu452lsyv2mns2ydpepczr3v7qpaswh0';
-        }
+        // Direct donation to the official ReliefShield Treasury address
+        const activeConfig = walletState.network === 'preprod' ? PREPROD_CONTRACT_CONFIG : RELIEF_SHIELD_CONTRACT_CONFIG;
+        const destination = activeConfig.treasuryAddress;
 
         const desiredOutputs = [
           {

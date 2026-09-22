@@ -6,6 +6,7 @@
 
 export interface ContractConfig {
   contractAddress: string;
+  treasuryAddress: string;
   network: 'preview' | 'preprod';
   proofServerUrl: string;
   indexerUrl: string;
@@ -13,6 +14,7 @@ export interface ContractConfig {
 
 export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
   contractAddress: '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a',
+  treasuryAddress: 'mn_addr_preview1j3wddjr08funglalkectwpfv5fdr6p9c9qsce9em0qch27p0z5gsqtkdgd',
   network: 'preview',
   proofServerUrl: 'http://127.0.0.1:6300',
   indexerUrl: 'https://indexer.preview.midnight.network/api/v4/graphql',
@@ -20,6 +22,7 @@ export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
 
 export const PREPROD_CONTRACT_CONFIG: ContractConfig = {
   contractAddress: '2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b',
+  treasuryAddress: 'mn_addr_preprod1cd6qr5lreezhv2e3wp58naz7wspu452lsyv2mns2ydpepczr3v7qpaswh0',
   network: 'preprod',
   proofServerUrl: 'http://127.0.0.1:6300',
   indexerUrl: 'https://indexer.preprod.midnight.network/api/v4/graphql',
