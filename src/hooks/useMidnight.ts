@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
   readTotalReliefPoolFromIndexer, 
+  queryIndexerContractState,
   getDeployedContractAddress,
   RELIEF_SHIELD_CONTRACT_CONFIG, 
   PREPROD_CONTRACT_CONFIG,
@@ -556,11 +557,33 @@ export function useMidnight() {
         }
       };
 
-      // 3. Execute generated donateShielded circuit passing secretAmount and secretNonce
+      // 3. Obtain current contract state from Midnight Indexer or initialize authentic contract state
+      let contractStateData: any = null;
+      try {
+        const indexerRes = await queryIndexerContractState(deployedContractAddress, walletState.network);
+        if (indexerRes?.state) {
+          const hex = indexerRes.state.replace(/^0x/, '');
+          const decoded = compactRuntime.StateValue.decode(compactRuntime.fromHex(hex));
+          contractStateData = new compactRuntime.ChargedState(decoded);
+        }
+      } catch (idxErr) {
+        console.warn('[ReliefShield ZK] Indexer state query notice:', idxErr);
+      }
+
+      if (!contractStateData) {
+        const constructorCtx = {
+          initialPrivateState: {},
+          initialZswapLocalState: { coinPublicKey: new Uint8Array(32) },
+        };
+        const initialRes = contract.initialState(constructorCtx, new Uint8Array(32));
+        contractStateData = initialRes.currentContractState.data;
+      }
+
+      // 4. Execute generated donateShielded circuit passing secretAmount and secretNonce
       const circuitContext = compactRuntime.createCircuitContext(
         compactRuntime.dummyContractAddress(),
         new Uint8Array(32),
-        new compactRuntime.ChargedState(compactRuntime.StateValue.newArray()),
+        contractStateData,
         {}
       );
 
