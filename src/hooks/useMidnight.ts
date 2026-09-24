@@ -203,6 +203,37 @@ const queryLaceBalances = async (api: any): Promise<number> => {
   return total;
 };
 
+/**
+ * Extracts human-readable failure descriptions from Effect-TS FiberFailure and DApp Connector errors
+ */
+const extractFiberOrErrorDetails = (err: any): string => {
+  if (!err) return '';
+  if (err.cause) {
+    const c = err.cause;
+    if (typeof c === 'string') return c;
+    if (c.failure) {
+      const f = c.failure;
+      if (typeof f === 'string') return f;
+      if (f.message) return f.message;
+      if (f._tag) return `${f._tag}${f.detail ? `: ${f.detail}` : ''}`;
+      try {
+        const str = JSON.stringify(f);
+        if (str !== '{}') return str;
+      } catch {}
+    }
+    if (c.message) return c.message;
+    if (c._tag) return `${c._tag}${c.detail ? `: ${c.detail}` : ''}`;
+    try {
+      const str = JSON.stringify(c);
+      if (str !== '{}') return str;
+    } catch {}
+  }
+  if (err.message && err.message.trim().length > 0) return err.message;
+  if (err.reason) return err.reason;
+  if (err.code) return String(err.code);
+  return typeof err === 'string' ? err : '';
+};
+
 export function useMidnight() {
   const [walletState, setWalletState] = useState<MidnightWalletState>(() => {
     const cached = typeof window !== 'undefined' ? Number(localStorage.getItem('reliefshield_cached_balance') || '0') : 0;
@@ -516,6 +547,12 @@ export function useMidnight() {
       throw new Error('Donation amount must be strictly greater than 0.');
     }
 
+    if (walletState.walletBalance > 0 && secretAmount > walletState.walletBalance) {
+      throw new Error(
+        `Insufficient tNIGHT balance. You requested to contribute ${secretAmount} tNIGHT, but your wallet currently has ${walletState.walletBalance} tNIGHT. Please enter a smaller amount (e.g. 1 tNIGHT) or fund your wallet.`
+      );
+    }
+
     setIsExecutingCircuit(true);
     setCircuitStage('generating_witness');
 
@@ -763,11 +800,8 @@ export function useMidnight() {
       setIsExecutingCircuit(false);
       setCircuitStage('idle');
       
-      const rawMsg = 
-        err?.reason || 
-        err?.message || 
-        err?.code || 
-        (typeof err === 'string' ? err : '');
+      const rawMsg = extractFiberOrErrorDetails(err);
+      console.log('[ReliefShield ZK] Processed error detail:', rawMsg);
 
       const isDeclined = 
         rawMsg.toLowerCase().includes('reject') || 
@@ -779,9 +813,21 @@ export function useMidnight() {
         throw new Error('Transaction was cancelled by user in Lace wallet.');
       }
 
+      const isInsufficientFunds =
+        rawMsg.toLowerCase().includes('insufficient') ||
+        rawMsg.toLowerCase().includes('notenough') ||
+        rawMsg.toLowerCase().includes('coinselection') ||
+        rawMsg.toLowerCase().includes('funds');
+
+      if (isInsufficientFunds) {
+        throw new Error(
+          `Insufficient tNIGHT balance in wallet. Please ensure your wallet has enough unshielded tNIGHT to cover ${secretAmount} tNIGHT plus network fees, or enter a smaller amount (e.g. 1 tNIGHT).`
+        );
+      }
+
       let userFriendlyMsg = rawMsg;
       if (!userFriendlyMsg || userFriendlyMsg === 'Error' || userFriendlyMsg.trim().length === 0) {
-        userFriendlyMsg = 'Transaction rejected by Midnight Lace. Common cause: your wallet requires DUST (gas generated over time from tNIGHT) to balance and pay transaction fees, or the Midnight Preview node was temporarily busy. Please ensure your wallet has accrued DUST and retry.';
+        userFriendlyMsg = `Transaction rejected by Midnight Lace: ${String(err)}. Please ensure your wallet has enough unshielded tNIGHT and DUST gas to complete the transaction.`;
       }
 
       throw new Error(userFriendlyMsg);
