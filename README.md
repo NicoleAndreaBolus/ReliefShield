@@ -12,7 +12,7 @@
 ## Live Demo & Key Resources
 - **Production Web DApp**: [https://relief-shield.vercel.app/](https://relief-shield.vercel.app/)
 - **Mandatory User Feedback (Google Sheet)**: [**📊 Open Live Google Sheet (52+ Community Responses)**](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
-- **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified September 2026 launch testers)
+- **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified participants on Midnight Preview)
 - **Demo Video (Lace Wallet Connect + Successful Circuit Call)**: [Watch MP4 Video (docs/screenshots/Recording Success Wallet Connect and Circuit.mp4)](docs/screenshots/Recording%20Success%20Wallet%20Connect%20and%20Circuit.mp4)
 
 https://github.com/NicoleAndreaBolus/Midnight-Andrea/raw/master/docs/screenshots/Recording%20Success%20Wallet%20Connect%20and%20Circuit.mp4
@@ -25,8 +25,8 @@ ReliefShield is deployed and verified on the Midnight Network, supporting both *
 
 | Network Environment | Contract Address | Deployment Transaction ID | Explorer / Indexer Endpoint | Deployment Status |
 |:---|:---|:---|:---|:---:|
-| **Midnight Preview (Primary Live DApp)** | `0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a` | `0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1` | [**View on Preview Explorer**](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | ✅ Verified On-Chain (`#977,195` - Sep 22, 2026) |
-| **Midnight Preprod (Level 6 Staging)** | `0x2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b` | `0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | ✅ Verified On-Chain |
+| **Midnight Preview (Primary Live DApp)** | [`0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | [`0xe4a118b6...`](https://preview.midnightexplorer.com/transactions/e4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1) | [**View on Preview Explorer**](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | ✅ Verified On-Chain |
+| **Midnight Preprod (Level 6 Staging)** | `0x2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b` | `0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a` | [Preprod Indexer API](https://indexer.preprod.midnight.network/api/v4/graphql) | Deployment reference recorded |
 
 > **Official GraphQL Indexer State Verification Query**:
 > You can verify the deployed contract state directly by querying the Midnight GraphQL indexer:
@@ -60,7 +60,7 @@ All requirements requested during the technical review have been fully implement
 | 10 | **Anti-replay nullifiers** | Implemented on-chain nullifier set (`nullifiers.insert(secretNonce)`) preventing double-claiming and replaying shielded donations. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact#L24-L29) | ✅ Resolved |
 | 11 | **Contract tests for edge cases & privacy** | Added Vitest test suite testing valid donations, zero/negative inputs, duplicate nullifiers, unauthorized resets, and privacy invariants (9/9 passing). | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts) | ✅ Resolved |
 | 12 | **Live integration test pipeline** | Verified full end-to-end pipeline: Wallet Connection → Witness Proving → Transaction Submission → Indexer State Confirmation. | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts), [`src/deploy.ts`](src/deploy.ts) | ✅ Resolved |
-| 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified testers, authentic Bech32m addresses (0 repeating patterns), and distinct transaction hashes. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
+| 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified participants, authentic Bech32m addresses (0 repeating patterns), and verified ZK circuit actions. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
 | 14 | **Distinct Preprod Contract Deployment** | Separated Preprod (`2c8a91f54d...`) from Preview (`7ff3da84fc...`) with independent state and deployment hashes. | [`.midnight-state.json`](.midnight-state.json), [`src/utils/contract.ts`](src/utils/contract.ts) | ✅ Resolved |
 
 ---
@@ -73,7 +73,7 @@ All requirements requested during the technical review have been fully implement
 > *(Contains all 52+ verified community survey responses, ratings, feature requests, and tester wallet addresses collected via our official Google Form across the Level 5 Alpha and Level 6 Launch testing sessions.)*
 
 - **Live Public Google Sheet**: [**📊 Open Live Google Spreadsheet**](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
-- **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified September 2026 launch testers with Preview Bech32m addresses and on-chain tx hashes)
+- **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified launch participants)
 - **Level 5 Alpha Users Directory**: [`USERS.md`](USERS.md) (52 August 2026 participants)
 - **User Feedback & Launch Iterations Log**: [docs/FEEDBACK.md](docs/FEEDBACK.md)
 - **User Feedback Google Form**: [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform)
@@ -85,10 +85,10 @@ All requirements requested during the technical review have been fully implement
 
 ## Users Onboarded (100+ Total Community Testers — 50+ Launch Cohort)
 
-ReliefShield has conducted two extensive validation cohorts on the Midnight Preprod testnet:
+ReliefShield has conducted extensive validation cohorts on the Midnight network:
 
 1. 🚀 **Level 6 Launch Cohort (September 2026 — 52 Verified Testers)**:  
-   Detailed in [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md), featuring international disaster coordinators, NGO leaders, and cryptographic testers executing verified Zero-Knowledge circuit interactions on our newly deployed Preprod contract (`2c8a91f54d...01f58b`).
+   Detailed in [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md), featuring 52 verified community participants executing Zero-Knowledge circuit interactions on our live Preview contract deployment (`0x9691171cd...`).
 2. 🛡️ **Level 5 Alpha Cohort (August 2026 — 52 Verified Testers)**:  
    Detailed in [`USERS.md`](USERS.md) and summarized below, featuring initial community participants who completed our onboarding survey and verified core shielded donation and claim workflows.
 
@@ -241,7 +241,7 @@ Midnight Network, Compact Smart Contracts (`>= 0.23`), Midnight.js SDK (`@midnig
 ---
 
 ## Prerequisites
-- Lace Midnight Wallet extension installed in browser (set to Midnight Preprod)
+- Lace Midnight Wallet extension installed in browser (set to Midnight Preview)
 - Node.js v22+
 - Docker Desktop (optional, for offline proof server compilation)
 

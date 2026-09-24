@@ -1,222 +1,256 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import crypto from 'node:crypto';
+import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
+// Import the actual compiled Midnight Compact contract
+import { Contract, ledger } from '../contracts/managed/reliefshield/contract/index.js';
 
 /**
  * ReliefShield Smart Contract Test Suite
- * Level 4 / 5 Rigorous Verification:
+ * Executing against genuine Midnight Compact circuits & Compact runtime:
  * 1. Valid donations with private witness & nullifier
  * 2. Invalid inputs (zero, negative amounts)
- * 3. Anti-replay nullifier protection
- * 4. Admin authorization & unauthorized resets
+ * 3. Real second-call anti-replay nullifier protection
+ * 4. Real admin authorization & unauthorized resets
  * 5. Privacy preservation & witness isolation
- * 6. Live integration flow (wallet → proof → transaction → indexer confirmation)
+ * 6. Runtime integration lifecycle (Wallet → Proof Data → CallTx Interface → Indexer State)
  */
 
-interface LedgerState {
-  totalReliefPool: bigint;
-  admin: Uint8Array;
-  nullifiers: Set<string>;
+function createInitialContract(adminKey: Uint8Array) {
+  const contract = new Contract({});
+  const constructorCtx = {
+    initialPrivateState: {},
+    initialZswapLocalState: { coinPublicKey: new Uint8Array(32) },
+  };
+  const initRes = contract.initialState(constructorCtx, adminKey);
+  return {
+    contract,
+    state: initRes.currentContractState.data,
+    privateState: initRes.currentPrivateState,
+  };
 }
 
-class ReliefShieldContract {
-  public ledger: LedgerState;
-
-  constructor(initialAdmin: Uint8Array, initialPool: bigint = 0n) {
-    this.ledger = {
-      totalReliefPool: initialPool,
-      admin: initialAdmin,
-      nullifiers: new Set<string>(),
-    };
-  }
-
-  // Circuit 1: donateShielded(secretAmount: Uint<64>, secretNonce: Bytes<32>)
-  public donateShielded(secretAmount: bigint, secretNonce: Uint8Array): void {
-    if (secretAmount <= 0n) {
-      throw new Error('Donation amount must be positive');
-    }
-
-    const nullifierHex = Buffer.from(secretNonce).toString('hex');
-    if (this.ledger.nullifiers.has(nullifierHex)) {
-      throw new Error('Nullifier already used: replay rejected');
-    }
-
-    // Add to nullifier set
-    this.ledger.nullifiers.add(nullifierHex);
-
-    // Increment public relief pool by disclosed amount
-    this.ledger.totalReliefPool = (this.ledger.totalReliefPool + secretAmount) & 0xffffffffffffffffn;
-  }
-
-  // Circuit 2: resetPool(adminSecret: Bytes<32>, newValue: Uint<64>)
-  public resetPool(adminSecret: Uint8Array, newValue: bigint): void {
-    const isAuthorized = Buffer.compare(Buffer.from(adminSecret), Buffer.from(this.ledger.admin)) === 0;
-    if (!isAuthorized) {
-      throw new Error('Unauthorized: caller is not authorized admin');
-    }
-
-    this.ledger.totalReliefPool = newValue & 0xffffffffffffffffn;
-  }
+function executeDonateShielded(
+  contract: Contract,
+  state: any,
+  privateState: any,
+  secretAmount: bigint,
+  secretNonce: Uint8Array,
+) {
+  const circuitCtx = compactRuntime.createCircuitContext(
+    compactRuntime.dummyContractAddress(),
+    new Uint8Array(32),
+    state,
+    privateState,
+  );
+  const result = contract.circuits.donateShielded(circuitCtx, secretAmount, secretNonce);
+  return {
+    result,
+    nextState: result.context.currentQueryContext.state,
+    nextPrivateState: result.context.currentPrivateState,
+  };
 }
 
-describe('ReliefShield Compact Smart Contract Circuits', () => {
+function executeResetPool(
+  contract: Contract,
+  state: any,
+  privateState: any,
+  adminSecret: Uint8Array,
+  newValue: bigint,
+) {
+  const circuitCtx = compactRuntime.createCircuitContext(
+    compactRuntime.dummyContractAddress(),
+    new Uint8Array(32),
+    state,
+    privateState,
+  );
+  const result = contract.circuits.resetPool(circuitCtx, adminSecret, newValue);
+  return {
+    result,
+    nextState: result.context.currentQueryContext.state,
+    nextPrivateState: result.context.currentPrivateState,
+  };
+}
+
+describe('ReliefShield Compact Smart Contract Circuits (Genuine Runtime)', () => {
   const adminKey = new Uint8Array(crypto.randomBytes(32));
 
   describe('1. Valid Donations & State Transitions', () => {
+    it('should initialize with zero pool and correct admin key', () => {
+      const { state } = createInitialContract(adminKey);
+      const initialLedger = ledger(state);
+
+      expect(initialLedger.totalReliefPool).toBe(0n);
+      expect(Buffer.from(initialLedger.admin).equals(Buffer.from(adminKey))).toBe(true);
+      expect(initialLedger.nullifiers.size()).toBe(0n);
+    });
+
     it('should increment totalReliefPool with valid private witness and record nullifier', () => {
-      const contract = new ReliefShieldContract(adminKey, 100n);
+      const { contract, state, privateState } = createInitialContract(adminKey);
       const secretNonce = new Uint8Array(crypto.randomBytes(32));
       const donationAmount = 250n;
 
-      contract.donateShielded(donationAmount, secretNonce);
+      const { nextState } = executeDonateShielded(contract, state, privateState, donationAmount, secretNonce);
+      const updatedLedger = ledger(nextState);
 
-      expect(contract.ledger.totalReliefPool).toBe(350n);
-      expect(contract.ledger.nullifiers.has(Buffer.from(secretNonce).toString('hex'))).toBe(true);
-      expect(contract.ledger.nullifiers.size).toBe(1);
+      expect(updatedLedger.totalReliefPool).toBe(250n);
+      expect(updatedLedger.nullifiers.member(secretNonce)).toBe(true);
+      expect(updatedLedger.nullifiers.size()).toBe(1n);
     });
 
     it('should correctly accumulate multiple independent shielded donations', () => {
-      const contract = new ReliefShieldContract(adminKey, 0n);
+      const { contract, state, privateState } = createInitialContract(adminKey);
 
       const nonce1 = new Uint8Array(crypto.randomBytes(32));
-      contract.donateShielded(50n, nonce1);
-      expect(contract.ledger.totalReliefPool).toBe(50n);
+      const tx1 = executeDonateShielded(contract, state, privateState, 50n, nonce1);
+      const ledger1 = ledger(tx1.nextState);
+      expect(ledger1.totalReliefPool).toBe(50n);
+      expect(ledger1.nullifiers.size()).toBe(1n);
 
       const nonce2 = new Uint8Array(crypto.randomBytes(32));
-      contract.donateShielded(150n, nonce2);
-      expect(contract.ledger.totalReliefPool).toBe(200n);
-
-      expect(contract.ledger.nullifiers.size).toBe(2);
+      const tx2 = executeDonateShielded(contract, tx1.nextState, tx1.nextPrivateState, 150n, nonce2);
+      const ledger2 = ledger(tx2.nextState);
+      expect(ledger2.totalReliefPool).toBe(200n);
+      expect(ledger2.nullifiers.size()).toBe(2n);
+      expect(ledger2.nullifiers.member(nonce1)).toBe(true);
+      expect(ledger2.nullifiers.member(nonce2)).toBe(true);
     });
   });
 
   describe('2. Invalid Inputs Validation', () => {
-    it('should reject zero contribution amount', () => {
-      const contract = new ReliefShieldContract(adminKey, 100n);
+    it('should reject zero contribution amount with Compact assertion error', () => {
+      const { contract, state, privateState } = createInitialContract(adminKey);
       const secretNonce = new Uint8Array(crypto.randomBytes(32));
 
-      expect(() => contract.donateShielded(0n, secretNonce)).toThrow(
-        'Donation amount must be positive'
+      expect(() => executeDonateShielded(contract, state, privateState, 0n, secretNonce)).toThrow(
+        /Donation amount must be positive/
       );
-      expect(contract.ledger.totalReliefPool).toBe(100n);
+
+      const untouchedLedger = ledger(state);
+      expect(untouchedLedger.totalReliefPool).toBe(0n);
     });
 
-    it('should reject negative contribution amount', () => {
-      const contract = new ReliefShieldContract(adminKey, 100n);
-      const secretNonce = new Uint8Array(crypto.randomBytes(32));
+    it('should reject invalid nonce length or non-byte inputs', () => {
+      const { contract, state, privateState } = createInitialContract(adminKey);
+      const invalidNonce = new Uint8Array(16); // Must be 32 bytes
 
-      expect(() => contract.donateShielded(-25n, secretNonce)).toThrow(
-        'Donation amount must be positive'
+      expect(() => executeDonateShielded(contract, state, privateState, 100n, invalidNonce)).toThrow(
+        /Bytes<32>/
       );
-      expect(contract.ledger.totalReliefPool).toBe(100n);
-    });
-  });
-
-  describe('3. Anti-Replay Nullifier Mechanism', () => {
-    it('should reject replaying a donation with an already-used nullifier', () => {
-      const contract = new ReliefShieldContract(adminKey, 0n);
-      const secretNonce = new Uint8Array(crypto.randomBytes(32));
-
-      // First contribution succeeds
-      contract.donateShielded(100n, secretNonce);
-      expect(contract.ledger.totalReliefPool).toBe(100n);
-
-      // Attempting replay with identical nullifier MUST fail
-      expect(() => contract.donateShielded(100n, secretNonce)).toThrow(
-        'Nullifier already used: replay rejected'
-      );
-
-      // Ledger balance remains unaffected by the rejected replay
-      expect(contract.ledger.totalReliefPool).toBe(100n);
     });
   });
 
-  describe('4. Admin Authorization & Unauthorized Resets', () => {
+  describe('3. Real Second-Call Anti-Replay Nullifier Protection', () => {
+    it('should reject submitting the exact same nonce twice against the contract state', () => {
+      const { contract, state, privateState } = createInitialContract(adminKey);
+      const secretNonce = new Uint8Array(crypto.randomBytes(32));
+      const donationAmount = 100n;
+
+      // First contribution MUST succeed
+      const firstCall = executeDonateShielded(contract, state, privateState, donationAmount, secretNonce);
+      const stateAfterFirstCall = firstCall.nextState;
+      const ledgerAfterFirstCall = ledger(stateAfterFirstCall);
+
+      expect(ledgerAfterFirstCall.totalReliefPool).toBe(100n);
+      expect(ledgerAfterFirstCall.nullifiers.member(secretNonce)).toBe(true);
+      expect(ledgerAfterFirstCall.nullifiers.size()).toBe(1n);
+
+      // Second contribution with IDENTICAL secretNonce MUST be rejected by Compact circuit assert
+      expect(() =>
+        executeDonateShielded(
+          contract,
+          stateAfterFirstCall,
+          firstCall.nextPrivateState,
+          donationAmount,
+          secretNonce
+        )
+      ).toThrow(/Nullifier already used: replay rejected/);
+
+      // Pool balance remains strictly protected and unchanged
+      const ledgerAfterRejectedReplay = ledger(stateAfterFirstCall);
+      expect(ledgerAfterRejectedReplay.totalReliefPool).toBe(100n);
+      expect(ledgerAfterRejectedReplay.nullifiers.size()).toBe(1n);
+    });
+  });
+
+  describe('4. Real Admin Authorization & Unauthorized Resets', () => {
     it('should reject resetPool if caller provides an unauthorized key', () => {
-      const contract = new ReliefShieldContract(adminKey, 500n);
+      const { contract, state, privateState } = createInitialContract(adminKey);
       const unauthorizedKey = new Uint8Array(crypto.randomBytes(32));
 
-      expect(() => contract.resetPool(unauthorizedKey, 0n)).toThrow(
-        'Unauthorized: caller is not authorized admin'
+      // First donate some funds so pool > 0
+      const nonce = new Uint8Array(crypto.randomBytes(32));
+      const { nextState, nextPrivateState } = executeDonateShielded(contract, state, privateState, 500n, nonce);
+      expect(ledger(nextState).totalReliefPool).toBe(500n);
+
+      // Attempt unauthorized reset
+      expect(() => executeResetPool(contract, nextState, nextPrivateState, unauthorizedKey, 0n)).toThrow(
+        /Unauthorized: caller is not authorized admin/
       );
-      expect(contract.ledger.totalReliefPool).toBe(500n);
+
+      // Verify totalReliefPool was NOT reset
+      expect(ledger(nextState).totalReliefPool).toBe(500n);
     });
 
     it('should allow resetPool when called with the exact authorized admin key', () => {
-      const contract = new ReliefShieldContract(adminKey, 500n);
+      const { contract, state, privateState } = createInitialContract(adminKey);
+      const nonce = new Uint8Array(crypto.randomBytes(32));
+      const { nextState, nextPrivateState } = executeDonateShielded(contract, state, privateState, 500n, nonce);
 
-      contract.resetPool(adminKey, 10n);
-      expect(contract.ledger.totalReliefPool).toBe(10n);
+      // Authorized reset using adminKey
+      const resetResult = executeResetPool(contract, nextState, nextPrivateState, adminKey, 10n);
+      const resetLedger = ledger(resetResult.nextState);
+
+      expect(resetLedger.totalReliefPool).toBe(10n);
     });
   });
 
-  describe('5. Privacy Preservation & Witness Isolation', () => {
-    it('should isolate private witness inputs and only expose deliberate public ledger variables', () => {
-      const contract = new ReliefShieldContract(adminKey, 1000n);
-      const secretWitnessAmount = 500n;
+  describe('5. Privacy Model & Ledger State Disclosure', () => {
+    it('should disclose only totalReliefPool, admin, and nullifier hashes on the public ledger', () => {
+      const { contract, state, privateState } = createInitialContract(adminKey);
       const secretNonce = new Uint8Array(crypto.randomBytes(32));
 
-      contract.donateShielded(secretWitnessAmount, secretNonce);
+      const { nextState } = executeDonateShielded(contract, state, privateState, 300n, secretNonce);
+      const publicLedger = ledger(nextState);
 
-      // Verify public ledger exposes ONLY totalReliefPool, admin, and nullifier hashes
-      const publicKeys = Object.keys(contract.ledger);
-      expect(publicKeys).toContain('totalReliefPool');
-      expect(publicKeys).toContain('admin');
-      expect(publicKeys).toContain('nullifiers');
+      // The public ledger contains only the declared public fields
+      expect(publicLedger.totalReliefPool).toBe(300n);
+      expect(publicLedger.admin).toBeDefined();
+      expect(publicLedger.nullifiers).toBeDefined();
 
-      // Ensure donor identity and private witness are strictly absent
-      expect((contract.ledger as any).secretAmount).toBeUndefined();
-      expect((contract.ledger as any).donorAddress).toBeUndefined();
-      expect((contract.ledger as any).donorPrivateKey).toBeUndefined();
+      // Ensure donor identity/wallet address is never present in public ledger state
+      expect((publicLedger as any).donorAddress).toBeUndefined();
+      expect((publicLedger as any).donorIdentity).toBeUndefined();
+      expect((publicLedger as any).donorPublicKey).toBeUndefined();
     });
   });
 
-  describe('6. Live Integration Test (Wallet → Proof → Transaction → Indexer)', () => {
-    it('should complete full end-to-end integration lifecycle', async () => {
-      // Step A: Wallet Context Setup
-      const mockWallet = {
-        address: 'mn_addr_preprod1cd6qr5lreezhv2e3wp58naz7wspu452lsyv2mns2ydpepczr3v7qpaswh0',
-        balance: 1000n,
-      };
-
-      // Step B: Proof Generation (Local Compact ZK Prover)
+  describe('6. Runtime Integration Flow (Wallet Context → Proof Data → CallTx → Ledger Assertion)', () => {
+    it('should generate valid proof inputs and verify state transition with genuine runtime structures', () => {
+      const { contract, state, privateState } = createInitialContract(adminKey);
       const secretAmount = 100n;
-      const nullifier = new Uint8Array(crypto.randomBytes(32));
-      const zkProof = {
-        circuit: 'donateShielded',
-        publicInputs: [secretAmount],
-        nullifierHash: Buffer.from(nullifier).toString('hex'),
-        proofBytes: '0x' + crypto.randomBytes(64).toString('hex'),
-      };
+      const secretNonce = new Uint8Array(crypto.randomBytes(32));
 
-      expect(zkProof.proofBytes).toBeDefined();
+      // Step A: Circuit Context with Dummy Contract Address
+      const circuitCtx = compactRuntime.createCircuitContext(
+        compactRuntime.dummyContractAddress(),
+        new Uint8Array(32),
+        state,
+        privateState,
+      );
 
-      // Step C: Transaction Construction & Submission
-      const mockSubmitTx = vi.fn().mockResolvedValue({
-        txId: '0x' + crypto.randomBytes(32).toString('hex'),
-        blockHeight: 18452,
-        status: 'confirmed',
-      });
+      // Step B: Execute genuine generated circuit
+      const txResult = contract.circuits.donateShielded(circuitCtx, secretAmount, secretNonce);
 
-      const txResult = await mockSubmitTx({
-        from: mockWallet.address,
-        proof: zkProof.proofBytes,
-        amount: secretAmount,
-      });
+      // Step C: Verify partial proof data generated by Compact compiler runtime
+      expect(txResult.proofData).toBeDefined();
+      expect(txResult.proofData.input).toBeDefined();
+      expect(txResult.proofData.input.value.length).toBeGreaterThan(0);
+      expect(txResult.proofData.output).toBeDefined();
 
-      expect(mockSubmitTx).toHaveBeenCalledTimes(1);
-      expect(txResult.status).toBe('confirmed');
-      expect(txResult.txId).toMatch(/^0x[0-9a-f]{64}$/);
-
-      // Step D: Indexer Public Data Confirmation
-      const mockQueryIndexer = vi.fn().mockResolvedValue({
-        contractAddress: '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a',
-        totalReliefPool: 142n,
-        lastTransactionId: txResult.txId,
-      });
-
-      const indexerState = await mockQueryIndexer(txResult.txId);
-      expect(indexerState.totalReliefPool).toBe(142n);
-      expect(indexerState.lastTransactionId).toBe(txResult.txId);
+      // Step D: Decode resulting ledger state
+      const verifiedLedger = ledger(txResult.context.currentQueryContext.state);
+      expect(verifiedLedger.totalReliefPool).toBe(100n);
+      expect(verifiedLedger.nullifiers.member(secretNonce)).toBe(true);
     });
   });
 });
