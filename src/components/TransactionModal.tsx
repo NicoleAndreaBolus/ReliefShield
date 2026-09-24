@@ -177,7 +177,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               {/* Privacy Banner */}
               <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2">
                 <Lock className="w-4 h-4 text-[#ea580c] shrink-0" />
-                <span className="font-semibold">Proved without revealing your input or wallet identity</span>
+                <span className="font-semibold">Proved with shielded donor identity</span>
               </div>
 
               {/* Submit Button */}

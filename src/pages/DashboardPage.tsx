@@ -276,7 +276,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
             <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#ea580c] shrink-0" />
-              <span>Proved without revealing your input</span>
+              <span>Proved with shielded donor identity</span>
             </div>
 
             <button

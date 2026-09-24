@@ -56,12 +56,12 @@ All requirements requested during the technical review have been fully implement
 | 6 | **Remove fake hashes and mock delays** | Eliminated simulated delays, hardcoded transaction hashes, and fake confirmations in favor of live wallet & indexer states. | [`src/hooks/useMidnight.ts`](src/hooks/useMidnight.ts), [`src/components/TransactionModal.tsx`](src/components/TransactionModal.tsx) | ✅ Resolved |
 | 7 | **Read `totalReliefPool` from Indexer** | Connected reactive pool state to the Midnight GraphQL Indexer (`queryIndexerContractState`). | [`src/utils/contract.ts`](src/utils/contract.ts), [`src/pages/DashboardPage.tsx`](src/pages/DashboardPage.tsx) | ✅ Resolved |
 | 8 | **Admin authorization on `resetPool()`** | Enforced cryptographic administrative key disclosure verification (`disclose(adminSecret) == admin`). | [`contracts/reliefshield.compact`](contracts/reliefshield.compact#L31-L36) | ✅ Resolved |
-| 9 | **Privacy design with commitments/private inputs** | Kept `secretAmount`, `secretNonce`, and `adminSecret` strictly off-chain as private witness inputs; only validity proofs and pool sums hit the ledger. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact) | ✅ Resolved |
+| 9 | **Privacy design with commitments/private inputs** | Kept donor identity and witness execution off-chain; private witnesses provide inputs to the local zero-knowledge circuit while `disclose(secretAmount)` and `disclose(secretNonce)` enforce public pool accounting and anti-replay on ledger. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact) | ✅ Resolved |
 | 10 | **Anti-replay nullifiers** | Implemented on-chain nullifier set (`nullifiers.insert(secretNonce)`) preventing double-claiming and replaying shielded donations. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact#L24-L29) | ✅ Resolved |
-| 11 | **Contract tests for edge cases & privacy** | Added Vitest test suite testing valid donations, zero/negative inputs, duplicate nullifiers, unauthorized resets, and privacy invariants (9/9 passing). | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts) | ✅ Resolved |
+| 11 | **Contract tests for edge cases & privacy** | Added Vitest test suite testing valid donations, zero/negative inputs, duplicate nullifiers, unauthorized resets, and privacy invariants (10/10 passing). | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts) | ✅ Resolved |
 | 12 | **Live integration test pipeline** | Verified full end-to-end pipeline: Wallet Connection → Witness Proving → Transaction Submission → Indexer State Confirmation. | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts), [`src/deploy.ts`](src/deploy.ts) | ✅ Resolved |
 | 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified participants, authentic Bech32m addresses (0 repeating patterns), and verified ZK circuit actions. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
-| 14 | **Distinct Preprod Contract Deployment** | Separated Preprod (`2c8a91f54d...`) from Preview (`7ff3da84fc...`) with independent state and deployment hashes. | [`.midnight-state.json`](.midnight-state.json), [`src/utils/contract.ts`](src/utils/contract.ts) | ✅ Resolved |
+| 14 | **Distinct Preprod Contract Deployment** | Separated Preprod (`2c8a91f54d...`) from Preview (`9691171cd2...`) with independent state and deployment hashes. | [`src/deployments.json`](src/deployments.json), [`src/utils/contract.ts`](src/utils/contract.ts) | ✅ Resolved |
 
 ---
 
@@ -212,7 +212,7 @@ The following verifiable testnet transactions demonstrate active zero-knowledge 
 ## What This Product Does
 ReliefShield is a decentralized, zero-knowledge smart contract application that solves the transparency-privacy dilemma in humanitarian aid and emergency disaster relief. During major natural disasters (typhoons, floods, earthquakes), donors want absolute mathematical assurance that emergency funds are collected and accounted for, while disaster victims and donors require complete financial and personal privacy against malicious actors and public surveillance.
 
-Built on the Midnight Network, ReliefShield enables charitable donors, government emergency responders, NGOs, and disaster victims to participate in a dual-state aid ecosystem. Donors execute Compact zero-knowledge circuits in their browser via the Midnight Lace Wallet to contribute emergency funds, updating the public relief pool tally in real time without disclosing their wallet addresses, personal wealth, or confidential contribution amounts.
+Built on the Midnight Network, ReliefShield enables charitable donors, government emergency responders, NGOs, and disaster victims to participate in a dual-state aid ecosystem. Donors execute Compact zero-knowledge circuits in their browser via the Midnight Lace Wallet to contribute emergency funds, updating the public relief pool tally in real time without disclosing their wallet addresses or personal financial identity.
 
 Midnight specifically makes this possible through its dual ledger and private witness model. Unlike transparent blockchains like Ethereum where every donation exposes the donor's entire financial history, Midnight allows local client-side proof generation, ensuring sensitive humanitarian data remains confidential while fund allocations remain 100% auditable.
 
@@ -223,15 +223,17 @@ Midnight specifically makes this possible through its dual ledger and private wi
   - `totalReliefPool`: Aggregated emergency relief pool balance (`Uint<64>`).
   - `admin`: Public 32-byte cryptographic identifier of the authorized emergency relief administrator.
   - `nullifiers`: Set of 32-byte cryptographic nullifier hashes (`Set<Bytes<32>>`) that prevent double-claiming or replaying shielded transactions.
+  - Disclosed contribution amount (`disclose(secretAmount)`): Disclosed on-chain to transparently increment `totalReliefPool`.
+  - Disclosed nullifier (`disclose(secretNonce)`): Disclosed on-chain and inserted into the `nullifiers` set to prevent double-spending or replay attacks.
   - Smart contract verification keys, block height timestamps, and zero-knowledge proof verification results.
 - **What is PRIVATE (witness memory, strictly kept off-chain in browser):**
-  - Private contribution witness input (`secretAmount`), processed strictly inside the local prover.
-  - Donor salt / entropy (`secretNonce`), used to derive cryptographic nullifiers without leaking wallet identity.
-  - Administrator private key (`adminSecret`), required to authorize `resetPool()` operations.
-  - Donor and beneficiary wallet keys, identities, and undisclosed net assets.
+  - **Donor wallet address & identity linkage**: Completely shielded by the zero-knowledge circuit. The transaction on-chain is unlinked to the donor's wallet address or account identity.
+  - Donor wallet keys, unspent UTXO notes, and unshielded account balance history.
+  - Off-chain witness execution: Private inputs are computed and proven locally in the user's browser via the Midnight Lace Wallet before proof submission.
+  - Beneficiary / victim legal identities and residential records.
 - **What the user PROVES without revealing:**
-  - The donor proves that their contribution is positive (`secretAmount > 0`), that their nullifier has not been spent (`!nullifiers.member(secretNonce)`), and that the arithmetic ledger increment is valid, **without revealing their identity or undisclosed balance**.
-  - The administrator proves knowledge of the secret administrative credential (`disclose(adminSecret) == admin`) without exposing the key material in plaintext.
+  - The donor proves that their contribution is positive (`secretAmount > 0`), that their nullifier has not been previously spent (`!nullifiers.member(disclose(secretNonce))`), and that the arithmetic ledger state transition is mathematically valid, **without revealing their donor wallet identity or linking the transaction to their personal financial account**.
+  - The administrator proves authorization (`disclose(adminSecret) == admin`) to execute administrative actions like `resetPool()` with authentic cryptographic credentials.
 
 ---
 
