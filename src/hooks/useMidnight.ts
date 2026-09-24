@@ -375,11 +375,37 @@ export function useMidnight() {
         localStorage.setItem('reliefshield_cached_balance', liveBalance.toString());
       }
 
+      // Automatically detect network from Lace configuration and address prefix
+      let detectedNetwork: 'preview' | 'preprod' = 'preview';
+
+      if (typeof api.getConfiguration === 'function') {
+        try {
+          const config = await api.getConfiguration();
+          const endpoints = `${config?.indexerUri || ''} ${config?.substrateNodeUri || ''}`.toLowerCase();
+          if (endpoints.includes('preprod')) {
+            detectedNetwork = 'preprod';
+          } else if (endpoints.includes('preview')) {
+            detectedNetwork = 'preview';
+          }
+        } catch (cErr) {
+          console.warn('[Lace] Network configuration detection note:', cErr);
+        }
+      }
+
+      if (address) {
+        const lowerAddr = address.toLowerCase();
+        if (lowerAddr.includes('preprod') || lowerAddr.startsWith('mn_addr_preprod') || lowerAddr.startsWith('mn_preprod')) {
+          detectedNetwork = 'preprod';
+        } else if (lowerAddr.includes('preview') || lowerAddr.startsWith('mn_addr_preview') || lowerAddr.startsWith('mn_preview')) {
+          detectedNetwork = 'preview';
+        }
+      }
+
       setWalletState({
         isConnected: true,
         walletAddress: address,
         walletBalance: liveBalance,
-        network: 'preview',
+        network: detectedNetwork,
         isConnecting: false,
         isLaceInstalled: true,
         error: null,
@@ -443,6 +469,14 @@ export function useMidnight() {
     setApiInstance(null);
     setLastTxHash(null);
   }, [checkLaceInstalled]);
+
+  // Switch network manually
+  const switchNetwork = useCallback((targetNetwork: 'preview' | 'preprod') => {
+    setWalletState((prev) => ({
+      ...prev,
+      network: targetNetwork,
+    }));
+  }, []);
 
   /**
    * Call the real donateShielded() circuit through Midnight DApp Connector flow
@@ -716,6 +750,7 @@ export function useMidnight() {
     ...walletState,
     connectWallet,
     disconnectWallet,
+    switchNetwork,
     donateShielded,
     executeCircuit: donateShielded, // Backward compatible alias for components
     isExecutingCircuit,
