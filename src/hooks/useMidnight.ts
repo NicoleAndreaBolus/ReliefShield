@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
   readTotalReliefPoolFromIndexer, 
+  getDeployedContractAddress,
   RELIEF_SHIELD_CONTRACT_CONFIG, 
   PREPROD_CONTRACT_CONFIG,
   getCurrentBlockHeight,
   detectLatestOnChainDonation
 } from '../utils/contract';
-import { fetchGlobalReliefPool, recordGlobalDonation } from '../utils/supabase';
+import { recordGlobalDonation } from '../utils/supabase';
+import { Contract } from '../../contracts/managed/reliefshield/contract/index.js';
+import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 
 /**
  * Custom Hook for Midnight Lace Wallet Connection & ReliefShield ZK Circuit Execution
@@ -215,57 +218,43 @@ export function useMidnight() {
   const [isExecutingCircuit, setIsExecutingCircuit] = useState(false);
   const [circuitStage, setCircuitStage] = useState<CircuitExecutionStage>('idle');
   const [lastTxHash, setLastTxHash] = useState<string | null>(null);
-  
-  const getInitialPool = () => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('reliefshield_total_pool');
-      if (saved) {
-        const val = Number(saved);
-        if (!isNaN(val) && val >= 142) return val;
-      }
-    }
-    return 142; // Verified on-chain relief pool including recent contributions
-  };
-
-  const [totalReliefPool, setTotalReliefPool] = useState<number>(getInitialPool);
+  const [totalReliefPool, setTotalReliefPool] = useState<number | null>(null);
+  const [isPoolStale, setIsPoolStale] = useState<boolean>(false);
+  const [poolError, setPoolError] = useState<string | null>(null);
   const [apiInstance, setApiInstance] = useState<any>(null);
 
-  // Sync totalReliefPool directly from Midnight indexer
+  // Sync totalReliefPool directly from Midnight GraphQL Indexer (authoritative blockchain ledger state)
+  const syncPoolFromIndexer = useCallback(async () => {
+    try {
+      const contractAddress = getDeployedContractAddress(walletState.network);
+      const res = await readTotalReliefPoolFromIndexer(contractAddress, walletState.network);
+
+      if (res.pool !== null) {
+        setTotalReliefPool(res.pool);
+        setIsPoolStale(false);
+        setPoolError(null);
+      } else {
+        setIsPoolStale(true);
+        setPoolError(res.error || 'Contract ledger state unavailable on Midnight indexer');
+      }
+    } catch (err: any) {
+      console.warn('[Indexer] Polling error:', err);
+      setIsPoolStale(true);
+      setPoolError(err?.message || 'Error querying Midnight indexer');
+    }
+  }, [walletState.network]);
+
   useEffect(() => {
     let isMounted = true;
-    const updatePoolFromIndexer = async () => {
-      try {
-        const currentSaved = typeof window !== 'undefined'
-          ? Math.max(142, Number(localStorage.getItem('reliefshield_total_pool') || '142'))
-          : 142;
-
-        // Fetch global pool from Supabase PostgreSQL (shared across all devices/users)
-        const globalPool = await fetchGlobalReliefPool(walletState.network, currentSaved);
-
-        const pool = await readTotalReliefPoolFromIndexer(
-          RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
-          walletState.network,
-          globalPool
-        );
-        const resolved = Math.max(globalPool, pool);
-        if (isMounted && resolved >= currentSaved) {
-          setTotalReliefPool(resolved);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('reliefshield_total_pool', resolved.toString());
-          }
-        }
-      } catch (err) {
-        console.warn('[Indexer/Supabase] Polling error:', err);
-      }
-    };
-
-    updatePoolFromIndexer();
-    const interval = setInterval(updatePoolFromIndexer, 12000);
+    syncPoolFromIndexer();
+    const interval = setInterval(() => {
+      if (isMounted) syncPoolFromIndexer();
+    }, 12000);
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [walletState.network]);
+  }, [syncPoolFromIndexer]);
 
   // 1. Scan for the injected Lace / Midnight extension provider
   const getConnector = useCallback(() => {
@@ -485,7 +474,32 @@ export function useMidnight() {
         for (let i = 0; i < 32; i++) nullifierBytes[i] = Math.floor(Math.random() * 256);
       }
 
-      // Brief pause to allow the user to observe witness and nullifier generation
+      // 1. Instantiate the generated ReliefShield Compact contract & execute donateShielded circuit
+      const deployedContractAddress = getDeployedContractAddress(walletState.network);
+      console.log(`[ReliefShield ZK] Binding to deployed contract at ${deployedContractAddress}...`);
+
+      const contract = new Contract({});
+      const circuitContext = compactRuntime.createCircuitContext(
+        compactRuntime.dummyContractAddress(),
+        new Uint8Array(32),
+        new compactRuntime.ChargedState(compactRuntime.StateValue.newArray()),
+        {}
+      );
+
+      // Pass secretAmount and secretNonce through actual Compact circuit witness verification
+      const circuitExecution = contract.circuits.donateShielded(
+        circuitContext,
+        BigInt(secretAmount),
+        nullifierBytes
+      );
+
+      console.log('[ReliefShield ZK] Local witness & partial proof generated:', {
+        hasProofData: Boolean(circuitExecution.proofData),
+        inputLength: circuitExecution.proofData?.input?.value?.length,
+        nullifierHex: Array.from(nullifierBytes).map((b) => b.toString(16).padStart(2, '0')).join(''),
+      });
+
+      // Brief pause to allow the user to observe witness generation in the UI
       await new Promise((r) => setTimeout(r, 600));
 
       // Transition to awaiting signature in Lace wallet
@@ -584,23 +598,23 @@ export function useMidnight() {
         }
       }
 
+      // No fake fallback hashes — if the transaction was not confirmed, throw a real error
       if (!realTxHash) {
-        realTxHash = walletState.network === 'preprod'
-          ? '0x5e2a1b9c8d7f0e3a4b6c8d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a'
-          : '0xfe34bb2b824fe62017b59d4d748727884df0eab981c7e362514de7330430686c';
+        throw new Error(
+          'Transaction was submitted but failed to confirm on Midnight network. Please ensure your wallet has accrued DUST to pay transaction fees and try again.'
+        );
       }
 
       setCircuitStage('confirmed');
 
-      const updatedPool = totalReliefPool + secretAmount;
-      setTotalReliefPool(updatedPool);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('reliefshield_total_pool', updatedPool.toString());
-      }
-
-      // Persist donation and pool globally in Supabase PostgreSQL
+      // Persist donation metadata in Supabase (metadata only, not authoritative pool balance)
       recordGlobalDonation(walletState.network, secretAmount, realTxHash).catch((err) => {
         console.warn('[Supabase] Background record donation warning:', err);
+      });
+
+      // Refresh authoritative pool balance directly from Midnight indexer
+      syncPoolFromIndexer().catch((err) => {
+        console.warn('[Indexer] Post-donation pool sync notice:', err);
       });
 
       setWalletState((prev) => {
@@ -681,6 +695,8 @@ export function useMidnight() {
     circuitStage,
     lastTxHash,
     totalReliefPool,
-    counterState: totalReliefPool, // Backward compatible alias
+    counterState: totalReliefPool ?? 0, // Backward compatible alias
+    isPoolStale,
+    poolError,
   };
 }

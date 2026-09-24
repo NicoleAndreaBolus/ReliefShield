@@ -33,7 +33,11 @@ export const PrivacyMatrix: React.FC = () => {
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Zero-Knowledge Proof Verification Success State</span>
+                <span>Disclosed Contribution Amount & Anti-Replay Nullifier</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>Zero-Knowledge Proof Verification & Settlement State</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -50,11 +54,11 @@ export const PrivacyMatrix: React.FC = () => {
             <ul className="text-xs text-slate-300 space-y-2 font-mono">
               <li className="flex items-start gap-2">
                 <ShieldAlert className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
-                <span>Donor Wallet Address / Identity Linkage</span>
+                <span>Donor Wallet Address / Identity Linkage (Shielded)</span>
               </li>
               <li className="flex items-start gap-2">
                 <ShieldAlert className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
-                <span>Raw Secret Witness Inputs in Memory</span>
+                <span>Donor Secret Witness Entropy & Unshielded History</span>
               </li>
               <li className="flex items-start gap-2">
                 <ShieldAlert className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
@@ -65,7 +69,7 @@ export const PrivacyMatrix: React.FC = () => {
         </div>
 
         <div className="p-4 rounded-2xl bg-orange-950/20 border border-orange-500/20 text-xs text-orange-200/90 leading-relaxed font-mono">
-          <strong>Privacy Claim Guarantee:</strong> Any third-party observer auditing the block explorer can mathematically confirm that the donation was validly processed into the campaign pool, but can NEVER determine who donated or link the transaction to the donor's identity.
+          <strong>Privacy Claim Guarantee:</strong> Any third-party observer auditing the block explorer can mathematically confirm that the donation amount was validly processed and added to the public relief pool, but can NEVER determine who donated or link the transaction to the donor's identity.
         </div>
       </div>
     </section>

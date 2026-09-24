@@ -1,8 +1,6 @@
-/**
- * ReliefShield Smart Contract Interaction & Indexer Client
- * Midnight Network — Preview / Preprod
- * Connected to generated ReliefShield Compact Contract Bindings
- */
+import midnightState from '../../.midnight-state.json';
+import { StateValue, fromHex } from '@midnight-ntwrk/compact-runtime';
+import { ledger } from '../../contracts/managed/reliefshield/contract/index.js';
 
 export interface ContractConfig {
   contractAddress: string;
@@ -12,8 +10,23 @@ export interface ContractConfig {
   indexerUrl: string;
 }
 
+/**
+ * Dynamically resolves deployed contract address from .midnight-state.json
+ */
+export function getDeployedContractAddress(network: 'preview' | 'preprod' = 'preview'): string {
+  const deployment = (midnightState as any)?.deployments?.[network];
+  if (deployment?.address) {
+    return deployment.address;
+  }
+  return network === 'preprod'
+    ? '2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b'
+    : '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a';
+}
+
 export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
-  contractAddress: '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a',
+  get contractAddress() {
+    return getDeployedContractAddress('preview');
+  },
   treasuryAddress: 'mn_addr_preview1j3wddjr08funglalkectwpfv5fdr6p9c9qsce9em0qch27p0z5gsqtkdgd',
   network: 'preview',
   proofServerUrl: 'http://127.0.0.1:6300',
@@ -21,7 +34,9 @@ export const RELIEF_SHIELD_CONTRACT_CONFIG: ContractConfig = {
 };
 
 export const PREPROD_CONTRACT_CONFIG: ContractConfig = {
-  contractAddress: '2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b',
+  get contractAddress() {
+    return getDeployedContractAddress('preprod');
+  },
   treasuryAddress: 'mn_addr_preprod1cd6qr5lreezhv2e3wp58naz7wspu452lsyv2mns2ydpepczr3v7qpaswh0',
   network: 'preprod',
   proofServerUrl: 'http://127.0.0.1:6300',
@@ -41,9 +56,10 @@ export function formatAddress(address: string, prefixLen = 8, suffixLen = 6): st
  * Query live contract state directly from the Midnight GraphQL Indexer
  */
 export async function queryIndexerContractState(
-  address: string = RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
+  address?: string,
   network: 'preview' | 'preprod' = 'preview'
 ): Promise<{ state: string | null; error?: string }> {
+  const targetAddress = address || getDeployedContractAddress(network);
   const indexerEndpoint = network === 'preview' 
     ? RELIEF_SHIELD_CONTRACT_CONFIG.indexerUrl 
     : PREPROD_CONTRACT_CONFIG.indexerUrl;
@@ -62,7 +78,7 @@ export async function queryIndexerContractState(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query,
-        variables: { address }
+        variables: { address: targetAddress }
       }),
     });
 
@@ -80,31 +96,48 @@ export async function queryIndexerContractState(
 }
 
 /**
- * Read totalReliefPool from the Midnight indexer
+ * Read totalReliefPool directly from the Midnight indexer.
+ * Uses genuine StateValue decoding and Compact contract ledger state.
+ * Returns null if the indexer is unavailable or contract state is not found,
+ * allowing the UI to present a genuine error or stale indicator rather than inventing ledger state.
  */
 export async function readTotalReliefPoolFromIndexer(
-  address: string = RELIEF_SHIELD_CONTRACT_CONFIG.contractAddress,
-  network: 'preview' | 'preprod' = 'preview',
-  fallbackPool: number = 142
-): Promise<number> {
+  address?: string,
+  network: 'preview' | 'preprod' = 'preview'
+): Promise<{ pool: number | null; isStale: boolean; error?: string }> {
+  const targetAddress = address || getDeployedContractAddress(network);
   try {
-    const { state } = await queryIndexerContractState(address, network);
-    if (state && typeof state === 'string') {
-      // In Midnight ledger encoding, contract cells encode Uint<64> counters
-      // Check last bytes of serialized ledger state for pool counter
-      try {
-        const hex = state.slice(-16);
-        const parsedVal = Number(BigInt(`0x${hex}`));
-        if (!isNaN(parsedVal) && parsedVal >= 0 && parsedVal < 1_000_000_000) {
-          return parsedVal > 0 ? parsedVal : fallbackPool;
-        }
-      } catch {}
-      return fallbackPool;
+    const { state, error } = await queryIndexerContractState(targetAddress, network);
+    if (error || !state) {
+      return {
+        pool: null,
+        isStale: true,
+        error: error || 'Contract state not found on Midnight indexer',
+      };
     }
-  } catch (e) {
-    console.warn('[Indexer] Could not parse totalReliefPool:', e);
+
+    const hex = state.replace(/^0x/, '');
+    const bytes = fromHex(hex);
+    const stateValue = StateValue.decode(bytes);
+    const decodedLedger = ledger(stateValue);
+    const poolVal = Number(decodedLedger.totalReliefPool);
+
+    if (!isNaN(poolVal) && poolVal >= 0) {
+      return { pool: poolVal, isStale: false };
+    }
+    return {
+      pool: null,
+      isStale: true,
+      error: 'Invalid pool state decoded from ledger',
+    };
+  } catch (err: any) {
+    console.warn('[Indexer] Could not parse totalReliefPool:', err);
+    return {
+      pool: null,
+      isStale: true,
+      error: err?.message || 'Failed to read totalReliefPool from indexer',
+    };
   }
-  return fallbackPool;
 }
 
 /**

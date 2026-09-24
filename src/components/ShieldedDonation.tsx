@@ -84,7 +84,7 @@ export const ShieldedDonation: React.FC<ShieldedDonationProps> = ({
           <span>Cryptographic Privacy Guarantee</span>
         </div>
         <p className="text-[11px] text-amber-900/90">
-          Your contribution amount is processed as a private witness inside your browser. On-chain observers only see that the public relief pool was incremented by a valid zero-knowledge proof, without disclosing your wallet identity, personal net worth, or undisclosed input value.
+          Your transaction is proven using Zero-Knowledge cryptography with your donor identity completely shielded. On-chain observers can verify that the public relief pool was incremented by your contribution amount and protected by an anti-replay nullifier, without ever exposing your wallet address or linking you to the donation.
         </p>
       </div>
 

@@ -56,7 +56,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           🛡️ Privacy Shield Active
         </span>
         <span className="font-mono bg-cyan-500/10 px-2.5 py-0.5 rounded-full text-cyan-300 border border-cyan-500/30">
-          Proved without revealing your input
+          Proved with shielded donor identity
         </span>
       </div>
 
@@ -133,7 +133,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             <span>Generating Proof...</span>
           </div>
           <p className="text-slate-400">
-            Computing Zero-Knowledge circuit proof in browser memory. Your secret witness input is evaluated locally and is never sent over the network.
+            Computing Zero-Knowledge circuit proof in browser memory. Your secret donor witness entropy is evaluated locally to ensure your wallet identity remains shielded from the on-chain ledger.
           </p>
         </div>
       )}

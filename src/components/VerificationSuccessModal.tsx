@@ -10,6 +10,7 @@ import {
   ArrowRight,
   X 
 } from 'lucide-react';
+import { getDeployedContractAddress } from '../utils/contract';
 
 export interface VerificationSuccessData {
   txHash: string;
@@ -223,7 +224,7 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
 
           <div className="text-center pt-1">
             <a
-              href={`https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a`}
+              href={`https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/contracts/${getDeployedContractAddress(network === 'preprod' ? 'preprod' : 'preview')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[11px] font-bold text-[#78716C] hover:text-[#ea580c] transition-colors inline-flex items-center gap-1"
