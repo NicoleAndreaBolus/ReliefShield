@@ -314,12 +314,26 @@ export function useMidnight() {
       let api: any = null;
 
       if (typeof connector.connect === 'function') {
+        const primaryNet = walletState.network || 'preview';
+        const fallbackNet = primaryNet === 'preview' ? 'preprod' : 'preview';
+
         try {
-          api = await connector.connect('preview');
-        } catch (connectErr) {
-          console.warn('[Lace] .connect("preview") failed, trying .enable():', connectErr);
-          if (typeof connector.enable === 'function') {
-            api = await connector.enable();
+          api = await connector.connect(primaryNet);
+        } catch (firstErr: any) {
+          console.warn(`[Lace] .connect("${primaryNet}") note (${firstErr?.code || firstErr?.message || 'APIError'}), trying "${fallbackNet}"...`);
+          try {
+            api = await connector.connect(fallbackNet);
+          } catch (secondErr: any) {
+            console.warn(`[Lace] .connect("${fallbackNet}") note, trying without network parameter...`);
+            try {
+              api = await connector.connect();
+            } catch (thirdErr: any) {
+              if (typeof connector.enable === 'function') {
+                api = await connector.enable();
+              } else {
+                throw firstErr;
+              }
+            }
           }
         }
       } else if (typeof connector.enable === 'function') {
@@ -327,7 +341,7 @@ export function useMidnight() {
       }
 
       if (!api) {
-        throw new Error('Could not establish API connection with Midnight Lace.');
+        throw new Error('Could not establish API connection with Midnight Lace. Please ensure the extension is unlocked.');
       }
 
       setApiInstance(api);
@@ -413,14 +427,22 @@ export function useMidnight() {
     } catch (err: any) {
       console.error('[Lace] Wallet authorization error:', err);
       const isDeclined = 
+        err?.code === 'Rejected' ||
+        err?.code === 'PermissionRejected' ||
         err?.message?.toLowerCase().includes('reject') || 
         err?.message?.toLowerCase().includes('decline') || 
         err?.message?.toLowerCase().includes('cancel') ||
+        err?.reason?.toLowerCase().includes('reject') ||
         err?.code === -1;
 
-      const errorMsg = isDeclined 
-        ? 'Connection request was cancelled in Lace wallet.' 
-        : (err?.message || 'Failed to authorize Midnight Lace wallet.');
+      let errorMsg = 'Failed to authorize Midnight Lace wallet.';
+      if (isDeclined) {
+        errorMsg = 'Connection request was cancelled or declined in Lace wallet.';
+      } else if (err?.code === 'Disconnected' || err?.message?.toLowerCase().includes('locked')) {
+        errorMsg = 'Midnight Lace extension is locked. Please unlock the extension with your password and try again.';
+      } else if (err?.reason || err?.message) {
+        errorMsg = err.reason || err.message;
+      }
 
       setWalletState((prev) => ({
         ...prev,
