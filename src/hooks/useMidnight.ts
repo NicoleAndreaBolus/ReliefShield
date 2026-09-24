@@ -627,42 +627,39 @@ export function useMidnight() {
         // Read tip height before contract transaction submission
         const startHeight = await getCurrentBlockHeight(walletState.network);
 
+        // Execute transaction via Lace DApp Connector:
+        const activeConfig = walletState.network === 'preprod' ? PREPROD_CONTRACT_CONFIG : RELIEF_SHIELD_CONTRACT_CONFIG;
+        const destination = activeConfig.treasuryAddress;
+        const tokenType = '0000000000000000000000000000000000000000000000000000000000000000';
+        const desiredOutputs = [
+          {
+            kind: 'unshielded' as const,
+            type: tokenType,
+            value: specks,
+            recipient: destination,
+          }
+        ];
+
         let txSubmission: any = null;
 
-        // Execute contract transaction via balanceUnsealedTransaction / submitTransaction
-        if (typeof apiInstance.balanceUnsealedTransaction === 'function') {
+        if (typeof apiInstance.makeTransfer === 'function') {
           try {
-            const rawCallData = JSON.stringify({
-              contractAddress: deployedContractAddress,
-              circuit: 'donateShielded',
-              amount: secretAmount,
-              nullifier: Array.from(nullifierBytes).map((b) => b.toString(16).padStart(2, '0')).join(''),
-              proofData: circuitExecution.proofData ? Array.from(circuitExecution.proofData.input.value) : [],
-            });
-            const balanced = await apiInstance.balanceUnsealedTransaction(rawCallData, { payFees: true });
-            if (balanced?.tx) {
-              if (typeof apiInstance.submitTransaction === 'function') {
-                await apiInstance.submitTransaction(balanced.tx);
-              }
-              txSubmission = balanced;
-            }
-          } catch (bErr) {
-            console.warn('[Lace] balanceUnsealedTransaction notice, trying direct submitTransaction:', bErr);
+            console.log('[Lace] Requesting transaction approval in Lace wallet...');
+            txSubmission = await apiInstance.makeTransfer(desiredOutputs, { payFees: true });
+            console.log('[Lace] Transaction approved and sealed in Lace wallet:', txSubmission);
+          } catch (mErr: any) {
+            console.warn('[Lace] makeTransfer error:', mErr);
+            throw mErr;
           }
         }
 
-        if (!txSubmission && typeof apiInstance.submitTransaction === 'function') {
+        // In Midnight Lace, some versions require submitTransaction to broadcast
+        if (typeof apiInstance.submitTransaction === 'function' && txSubmission?.tx) {
           try {
-            const contractTxPayload = JSON.stringify({
-              type: 'ContractCall',
-              contractAddress: deployedContractAddress,
-              circuit: 'donateShielded',
-              proof: circuitExecution.proofData ? Array.from(circuitExecution.proofData.input.value) : [],
-            });
-            await apiInstance.submitTransaction(contractTxPayload);
-            txSubmission = { tx: contractTxPayload };
-          } catch (sErr) {
-            console.warn('[Lace] submitTransaction contract call notice:', sErr);
+            await apiInstance.submitTransaction(txSubmission.tx);
+            console.log('[Lace] Transaction submitted to Midnight consensus network!');
+          } catch (subErr: any) {
+            console.warn('[Lace] submitTransaction notice (wallet may have broadcasted directly):', subErr?.message || subErr);
           }
         }
 
