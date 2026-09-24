@@ -825,6 +825,16 @@ export function useMidnight() {
         );
       }
 
+      const isProofFailure = 
+        rawMsg.toLowerCase().includes('failed to prove') ||
+        rawMsg.toLowerCase().includes('prove transaction');
+
+      if (isProofFailure) {
+        throw new Error(
+          'Failed to prove transaction in Midnight Lace. This occurs when your Lace wallet cannot communicate with the Zero-Knowledge proof server. Please open your Lace Extension Settings (Gear icon) -> Advanced/Midnight settings and ensure the Proof Server is set to Remote (or restart the extension and retry).'
+        );
+      }
+
       let userFriendlyMsg = rawMsg;
       if (!userFriendlyMsg || userFriendlyMsg === 'Error' || userFriendlyMsg.trim().length === 0) {
         userFriendlyMsg = `Transaction rejected by Midnight Lace: ${String(err)}. Please ensure your wallet has enough unshielded tNIGHT and DUST gas to complete the transaction.`;
