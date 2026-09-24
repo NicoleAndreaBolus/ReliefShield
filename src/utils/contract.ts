@@ -1,4 +1,4 @@
-import midnightState from '../../.midnight-state.json';
+import deployments from '../deployments.json';
 import { StateValue, fromHex } from '@midnight-ntwrk/compact-runtime';
 import { ledger } from '../../contracts/managed/reliefshield/contract/index.js';
 
@@ -11,13 +11,22 @@ export interface ContractConfig {
 }
 
 /**
- * Dynamically resolves deployed contract address from .midnight-state.json
+ * Dynamically resolves deployed contract address from public deployment records or env overrides
  */
 export function getDeployedContractAddress(network: 'preview' | 'preprod' = 'preview'): string {
-  const deployment = (midnightState as any)?.deployments?.[network];
-  if (deployment?.address) {
-    return deployment.address;
+  const envAddress = network === 'preprod'
+    ? (import.meta.env?.VITE_PREPROD_CONTRACT_ADDRESS as string)
+    : (import.meta.env?.VITE_CONTRACT_ADDRESS as string);
+
+  if (envAddress && envAddress.trim().length > 0) {
+    return envAddress.trim();
   }
+
+  const record = (deployments as any)?.[network];
+  if (record?.address) {
+    return record.address;
+  }
+
   return network === 'preprod'
     ? '2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b'
     : '9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a';
