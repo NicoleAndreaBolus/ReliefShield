@@ -24,7 +24,6 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          $HOME/.local/bin/compact update || true
 
       - name: Install Dependencies
         run: npm install
@@ -32,12 +31,12 @@ jobs:
       - name: Verify Compact Compiler Version
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          compact --version || $HOME/.local/bin/compact --version || true
+          compact --version
 
       - name: Compile ReliefShield Compact Contract
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          compact compile +0.31.1 contracts/reliefshield.compact contracts/managed/reliefshield || npm run compile || echo "Using pre-compiled ReliefShield artifacts in contracts/managed/reliefshield"
+          compact compile +0.31.1 contracts/reliefshield.compact contracts/managed/reliefshield
 
       - name: Run Test Suite
         run: npm test
