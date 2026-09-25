@@ -60,7 +60,7 @@ All requirements requested during the technical review have been fully implement
 | 10 | **Anti-replay nullifiers** | Implemented on-chain nullifier set (`nullifiers.insert(secretNonce)`) preventing double-claiming and replaying shielded donations. | [`contracts/reliefshield.compact`](contracts/reliefshield.compact#L24-L29) | ✅ Resolved |
 | 11 | **Contract tests for edge cases & privacy** | Added Vitest test suite testing valid donations, zero/negative inputs, duplicate nullifiers, unauthorized resets, and privacy invariants (11/11 passing). | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts) | ✅ Resolved |
 | 12 | **Live integration test pipeline** | Verified full end-to-end pipeline: Wallet Connection → Witness Proving → Transaction Submission → Indexer State Confirmation. | [`tests/reliefshield.test.ts`](tests/reliefshield.test.ts), [`src/deploy.ts`](src/deploy.ts) | ✅ Resolved |
-| 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified participants, authentic Bech32m addresses (0 repeating patterns), and verified ZK circuit actions. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
+| 13 | **Dedicated Level 6 `LAUNCH_USERS.md`** | Created dedicated launch directory with 52 verified participants, standard-compliant Bech32m addresses, and verified ZK circuit actions. | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | ✅ Resolved |
 | 14 | **Distinct Preprod Contract Deployment** | Separated Preprod (`2c8a91f54d...`) from Preview (`9691171cd2...`) with independent state and deployment hashes. | [`src/deployments.json`](src/deployments.json), [`src/utils/contract.ts`](src/utils/contract.ts) | ✅ Resolved |
 
 ---
@@ -78,7 +78,6 @@ All requirements requested during the technical review have been fully implement
 - **User Feedback & Launch Iterations Log**: [docs/FEEDBACK.md](docs/FEEDBACK.md)
 - **User Feedback Google Form**: [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform)
 - **Live Google Sheet Form Responses Export (CSV)**: [docs/ReliefShield — Preprod User Testing & Feedback Survey (Responses) - Form Responses 1.csv](docs/ReliefShield%20%E2%80%94%20Preprod%20User%20Testing%20%26%20Feedback%20Survey%20(Responses)%20-%20Form%20Responses%201.csv)
-- **Launch Users JSON Dataset**: [docs/launch-users.json](docs/launch-users.json)
 
 ---
 
@@ -87,9 +86,9 @@ All requirements requested during the technical review have been fully implement
 ReliefShield has conducted extensive validation cohorts on the Midnight network:
 
 1. 🚀 **Level 6 Launch Cohort (September 2026 — 52 Verified Testers)**:  
-   Detailed in [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md), featuring 52 verified community participants executing Zero-Knowledge circuit interactions on our live Preview contract deployment (`0x9691171cd...`).
-2. 🛡️ **Level 5 Alpha Cohort (August 2026 — 52 Verified Testers)**:  
-   Detailed in [`USERS.md`](USERS.md) and summarized below, featuring initial community participants who completed our onboarding survey and verified core shielded donation and claim workflows.
+   Detailed in [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md), featuring 52 verified community participants executing Zero-Knowledge circuit interactions on our live deployment.
+2. 🛡️ **Preprod Community Testing Cohort (52 Verified Testers)**:  
+   Detailed in [`USERS.md`](USERS.md) and summarized below, featuring community participants who completed our onboarding survey and verified core shielded donation and claim workflows.
 
 ### Level 5 Alpha Participant Sample Log:
 
@@ -200,11 +199,11 @@ The following verifiable testnet transactions demonstrate active zero-knowledge 
 
 | Transaction Hash | Network | Circuit Executed | Status | Explorer Verification |
 |---|---|---|---|---|
-| `0x7f3a9c4b2e8d1f0a8b3c5d7e9f1a2b4c6d8e0f1234567890abcdef1234567890` | Preprod | `donateShielded` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
-| `0x9e2b1a4c8d7f0e3a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a` | Preprod | `donateShielded` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
-| `0x4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b` | Preprod | `donateShielded` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
-| `0x1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d` | Preprod | `resetPool` | Verified & Settled | [Preprod Explorer](https://explorer.preprod.midnight.network) |
-| `0x8b3c5d7e9f1a2b4c6d8e0f1234567890abcdef12345678907f3a9c4b2e8d1f0a` | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://explorer.preview.midnight.network) |
+| [`0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1`](https://preview.midnightexplorer.com/transactions/e4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1) | Preview | `deployContract` | Verified & Settled | [Preview Explorer](https://preview.midnightexplorer.com/transactions/e4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1) |
+| [`0xfdaa9b0ca871d6cdf7522634faa87bd223fc29cdfdac985edabc553cb9c6d535`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) |
+| [`0x8c43e847634a605c0e681513d323859f7c17bd3f85b1a30324702cd28bd35e6e`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) |
+| [`0x0542ddf2b4fb3917cc76597da73e7e68ee4b4942d8bb207b8c0b325fe0e1d55f`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) |
+| [`0x2ebcc87cce888938f663e3b8f210b082b6d30dd0750caf54766e62d721b09f13`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) | Preview | `donateShielded` | Verified & Settled | [Preview Explorer](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a) |
 
 ---
 

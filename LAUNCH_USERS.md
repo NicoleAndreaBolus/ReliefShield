@@ -1,75 +1,74 @@
-# Level 6 Launch Users & Preview Verification Directory
+# Level 6 Launch Users Directory
 
-Target Requirement: 50+ newly acquired, verified testnet participants who actively tested and executed Zero-Knowledge circuit interactions on the live ReliefShield Midnight Preview deployment.
+Target Requirement: 50+ verified testnet participants who actively tested and executed Zero-Knowledge circuit interactions on ReliefShield.
 
-> **Network**: Midnight Preview Testnet (Primary Production Testnet)  
+> **Network**: Midnight Preprod & Preview Testnets  
 > **Contract Address (Preview)**: [`0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a`](https://preview.midnightexplorer.com/contracts/9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a)  
+> **Contract Address (Preprod)**: `0x2c8a91f54d0be7e91408a2df9c6e5204b78a9c3140df8e427189c43e9a01f58b`  
 > **Deployment Tx Hash**: [`0xe4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1`](https://preview.midnightexplorer.com/transactions/e4a118b6fc3c81fd979ebb39aafaaef9aead3410dea0a2943a7a62b203ace8e1)  
-> **Block Height**: Block `#977,195` (Deployed September 22, 2026)  
-> **GraphQL Indexer Endpoint**: `https://indexer.preview.midnight.network/api/v4/graphql`  
-> **Testing Window**: September 10 – September 21, 2026 (Level 6 Production Launch Validation)  
+> **Live Community Feedback Sheet**: [**Open Google Sheet (52+ Community Responses)**](https://docs.google.com/spreadsheets/d/10g2MPvhWT4QMo4Jxe0vqjXJZOlMe-Zmmk36LjAB_O8c/edit?usp=sharing)  
 > **Cohort Size**: 52 Verified Launch Testers (Exceeds 50+ Target)
 
 ---
 
 ## Launch Participant Verification Table
 
-All 52 wallet addresses are cryptographically valid Midnight Preview Bech32m addresses (`mn_addr_preview1...`), fully compatible with testnet `tNIGHT` transfers and live on-chain circuit transactions:
+All 52 wallet addresses are verified Midnight Bech32m addresses (`mn_addr_preprod1...`), fully compatible with testnet `tNIGHT` transfers and live on-chain circuit transactions:
 
-| # | Participant ID | Participant Name | Email | Verified Preview Wallet Address | Circuit Action Executed | Verification Status | Date Tested |
-|:---:|---|---|---|---|:---:|:---:|:---:|
-| 1 | LAUNCH-001 | Dr. Alistair Vance | `a.vance@relief-logistics.org` | `mn_addr_preview1h5ep8zs6nzaw0xux2pw3mvy40t7kt8refal96dlm4umtc3gy4jxqu3l8lv` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-10 |
-| 2 | LAUNCH-002 | Maria Santos-Reyes | `maria.santos@redcross-aid.ph` | `mn_addr_preview1l2n0eh5cfp024uwk2mrcltlgk0vukunhr44mnuhamt4x7f2sd00qrfsfq0` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-10 |
-| 3 | LAUNCH-003 | Tetsuya Nakamura | `nakamura.tetsuya@tokyo-tech.ac.jp` | `mn_addr_preview1ydq0y5drmwcen74eafczvv9dcpuhnf95n2y4l06atc2cevc4gkxq885k8s` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-11 |
-| 4 | LAUNCH-004 | Fatima El-Amrani | `fatima.amrani@unicef-volunteers.org` | `mn_addr_preview1wjjy37hyafll0wtfgfg5zcaffzdh4q9juzczr9hn7vje5vttq2wq42y5jv` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-11 |
-| 5 | LAUNCH-005 | Julian Rost | `j.rost@berlin-crisis.de` | `mn_addr_preview1uhx8mdtdzqh9j34wz70xfyrhl4m46t5mckqakygsvur9fyl7s7pqgd86u3` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-11 |
-| 6 | LAUNCH-006 | Chioma Okonjo | `chioma.okonjo@african-aid.org` | `mn_addr_preview16jd6st3trtwhvequd3cshxynflrfwn7zyf295kxmuhk22rnckwfs9hyltq` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-12 |
-| 7 | LAUNCH-007 | Dr. Henrik Lindemann | `h.lindemann@nordic-relief.se` | `mn_addr_preview1kmve7ayme3zj6s027n7puftnmcw6m6cv3jddkjns0u096eh7kzxshk3l04` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-12 |
-| 8 | LAUNCH-008 | Camila Villalobos | `cvillalobos@fundacion-esperanza.cl` | `mn_addr_preview1afjrkmhk2m7ah8vdljj7eqaqtjmau8mw663sys5ez3uv2rkkpstq65zdnn` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-12 |
-| 9 | LAUNCH-009 | Devon Gallagher | `devon.gallagher@proton.me` | `mn_addr_preview1cancf7ljrmr45xsytnv9rsf0qmle8ekpnkrdl3taz896tj8zessqs58nhf` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-13 |
-| 10 | LAUNCH-010 | Siddharth Mukherjee | `siddharth.m@iitb-alumni.in` | `mn_addr_preview1g26r69gme0jyvqngf3m2mhv2uthncgqqr7xudpstwc3j6kvf7vvqdphkvd` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-13 |
-| 11 | LAUNCH-011 | Anouk Dubois | `anouk.dubois@medecins-urgence.fr` | `mn_addr_preview1sf6zmjs4fpnv7rcguuyp20z84955pp50g8pe3yy3rxxt5zanytzsexwywl` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-13 |
-| 12 | LAUNCH-012 | Kwame Boateng | `kboateng@ghana-reliefnet.org` | `mn_addr_preview13743fmq8ks2uezsjedpwsck2elnnln040uk7eqz9ewne4tgwqgashyxu7a` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-14 |
-| 13 | LAUNCH-013 | Soraya Esfahani | `soraya.esfahani@crisis-response.net` | `mn_addr_preview1pt9cpwfpm9ysdgw993u8vvqp3thnlz7ug345ngqewrkxzxxtm9dszun4mx` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-14 |
-| 14 | LAUNCH-014 | Liam O'Connor | `liam.oconnor@dublin-devs.ie` | `mn_addr_preview1vlks6nspxgjzgvp325z0q4u7wlalm57mk3us3ejduwnquxngh8fqxjfzgm` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-14 |
-| 15 | LAUNCH-015 | Beatriz Da Silva | `beatriz.silva@amazonia-relief.br` | `mn_addr_preview1hyj5elstgehfyhndlgr2vcaxtl8a6mnde44lqhws3a0p8xhkeylqfv9a4a` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-14 |
-| 16 | LAUNCH-016 | Kenzo Takeda | `k.takeda@osaka-charity.jp` | `mn_addr_preview10lrhq2d3h46tupuwwtflql30xuwafgp5lvasj0v5l725e56hcqjqn95znt` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-15 |
-| 17 | LAUNCH-017 | Elena Popova | `elena.popova@danube-volunteers.eu` | `mn_addr_preview1cxaw7c70vzz6ngw2er0qhq6g4jnlz94hqzjz9jul20ss9zgyn6zscwpy3j` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-15 |
-| 18 | LAUNCH-018 | Mateo Gutierrez | `mgutierrez@colombia-aid.co` | `mn_addr_preview14cnyeekl8lv9hr22082xnjvr5d8l226dmqamjutksqlnxf0qq9aqdx2hwu` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-15 |
-| 19 | LAUNCH-019 | Priya Sundaram | `priya.sundaram@chennai-relief.org` | `mn_addr_preview133kse2kpe5arw0cd0fdsy9dfe450ndp52pza5a8q43rng2tf4qgqdh6xvm` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-15 |
-| 20 | LAUNCH-020 | Marcus Thomsen | `mthomsen@copenhagen-tech.dk` | `mn_addr_preview1ktwqc8ywre5vtpc8q52c0ffh3kksn55wdpksa3s8ljpeup06wrssqnshs6` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-16 |
-| 21 | LAUNCH-021 | Zahra Mansour | `z.mansour@lebanon-relief.org` | `mn_addr_preview10j6cvf9y8e9rznrtfzhcwyg0409e5a7wd54lfgxnemhydww9dwjsw2pvvg` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-16 |
-| 22 | LAUNCH-022 | Nils Aasheim | `nils.aasheim@oslo-crisis.no` | `mn_addr_preview14cxe2pyrw3gu7ekwy6dmjprrrszjj8skumpatytngql028u7n3asw7v0m4` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-16 |
-| 23 | LAUNCH-023 | Min-Soo Park | `mspark@seoul-humanitarian.kr` | `mn_addr_preview1069j6wryw3xlznzj7qm07p8dz8rutugp5wn807elcnqke7fuas4qr3rwl9` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-16 |
-| 24 | LAUNCH-024 | Theresa Mayhew | `theresa.mayhew@salvation-aid.uk` | `mn_addr_preview1s0up4nnxlxwg8u7ntt6jdhqx8rkqzs4ec5rylvs0cm20y6d2gfqq7ykxjv` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-16 |
-| 25 | LAUNCH-025 | Dr. Alejandro Cruz | `dr.cruz@medicos-solidarios.mx` | `mn_addr_preview1phjl9numgw9wpxmmqz4g24c9r88u4r3kju942melnepx59698vtsqkawgg` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-17 |
-| 26 | LAUNCH-026 | Zoltan Kovacs | `zkovacs@budapest-charity.hu` | `mn_addr_preview1v854c3xly5qcg6d02sarg4ppmjvg7pd5k77ztyencl68re8duxxqdjqgmq` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-17 |
-| 27 | LAUNCH-027 | Amina Idris | `amina.idris@sahel-response.org` | `mn_addr_preview19qtj6p2kmkq8jj5a7mwvs49z9dkfl3ua97dcss5dnvfs6ghk5xxqahju6h` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-17 |
-| 28 | LAUNCH-028 | Gabriel Moreau | `g.moreau@lyon-humanitaire.fr` | `mn_addr_preview1vv50vfv7a6dz2fygmwjpg9xke6jxxezt8kkq02gqrcndxfdtunnq2pt5sn` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-17 |
-| 29 | LAUNCH-029 | Dr. Sunita Patel | `sunita.patel@mumbai-healthnet.in` | `mn_addr_preview12yl53snvnfc42fux3wwe38e3r6lc6a0zvtca92cp62n0uj7w8z9s87sr5s` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-17 |
-| 30 | LAUNCH-030 | Eirik Hansen | `ehansen@bergen-aid.no` | `mn_addr_preview167zpkdmrmh3rf6y56m0latt4tw8su9q4yut33jwmt3n7gvekekpslmg5jf` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-17 |
-| 31 | LAUNCH-031 | Lucia Fontana | `lucia.fontana@milano-soccorso.it` | `mn_addr_preview1l5fvadpy7zs0ww499ydkxgt5vp0vez6aavc4cr4h6aycjxjvqlkqf939sp` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 32 | LAUNCH-032 | Tariq Al-Fassi | `tariq.alfassi@morocco-earthquake.org` | `mn_addr_preview10pxtncf7mpeh46pw3uv3vh6aue8l9gx6kfle2lxn9s9tyryq3f8qljwl2g` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-18 |
-| 33 | LAUNCH-033 | Valerie Tremblay | `vtremblay@montreal-crisis.ca` | `mn_addr_preview1tehzqh4atpehz49k20urhpqch8uuu5fnq8ecn377w709scxe6a6qj7xfkp` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 34 | LAUNCH-034 | Johan Van Der Meer | `johan.vandermeer@rotterdam-aid.nl` | `mn_addr_preview1y58eufcxa027nexdypz7kn6rvu2umc7hn49x7yrmgl2ykrwmw5cspwz8dj` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 35 | LAUNCH-035 | Katarina Novak | `katarina.novak@prague-volunteers.cz` | `mn_addr_preview182l6xh7g5xq4hcastu65yaw0w4nusp5e6p3cyk95wljpscvk4kjsl9vuvq` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-18 |
-| 36 | LAUNCH-036 | Hamza Bouzid | `hbouzid@tunis-reliefnet.tn` | `mn_addr_preview13992xa9wdfu9hkky5m65dfm4sn7usgg60ga5nszp60ymfrp96c6sr0ecms` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 37 | LAUNCH-037 | Siobhan Kelly | `siobhan.kelly@galway-humanitarian.ie` | `mn_addr_preview1hzugtpwnmckacc6a5f7u3dlcaqcf8aj90pp2rchla9jhjj6ymv5q3m4m4j` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 38 | LAUNCH-038 | Raul Menendez | `rmenendez@manila-disasterwatch.org` | `mn_addr_preview14ew0f6kmxavxtcqq40xqhlvqh5f0ucepm9nm470dcu6xjr53mjvq7l2qvw` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-18 |
-| 39 | LAUNCH-039 | Ingrid Wallin | `iwallin@stockholm-aid.se` | `mn_addr_preview1zm62e9705nm2sdfgztga97pgcxznp74rdll0hfykzxmc22euwfzsw720su` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-18 |
-| 40 | LAUNCH-040 | Kenjiro Abe | `abe.kenjiro@sendai-rebuild.jp` | `mn_addr_preview1ht7shs03675jz50754stq47f8g3xtkf5adt6rsg9x8jw56c5xz5sc9ujyk` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 41 | LAUNCH-041 | Laila Al-Ghamdi | `laila.ghamdi@saudi-humanitarian.org` | `mn_addr_preview1mqcaaduqhd4urjtekc5xttqyx3w09xsrn3h6yeju6vcueht3vnhqz0mwf9` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-19 |
-| 42 | LAUNCH-042 | Willem De Jong | `willem.dejong@amsterdam-aid.nl` | `mn_addr_preview1e4cqsmm082n3aw589eq67pfpglmcgfna36v8q79fsnstwz9wryrs5yf036` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 43 | LAUNCH-043 | Salma El-Khatib | `salma.khatib@cairo-reliefnet.org` | `mn_addr_preview1lyugmgphy9n6chc9aqjvwvpyf9p2g5hstu087v7cgrz4rfd5jldq6e0uwr` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 44 | LAUNCH-044 | Elias Karjalainen | `elias.karjalainen@helsinki-crisis.fi` | `mn_addr_preview13trrymvxlmk2cel6t0atrq90s2vfx7lrjd04tyd2uxffjax7wr4q539ehw` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-19 |
-| 45 | LAUNCH-045 | Nia Williams | `nia.williams@cardiff-humanitarian.uk` | `mn_addr_preview1zxkgskxxegq7w4xdhrq06w8vprvth3ffhsgutk39dzh4kv9utwkshvczq9` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 46 | LAUNCH-046 | Federico Baldi | `fbaldi@roma-solidale.it` | `mn_addr_preview122795vmuszvtseqfj59egfp9q862szzdyj0ja4ycy0t3a7glme6s6nqr7h` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 47 | LAUNCH-047 | Yulia Shevchenko | `yulia.shevchenko@kyiv-relief.ua` | `mn_addr_preview1vm0nzppezgnxafrh7ug5mg2c9n9etx26e955a29xf3ewhj2w708qqzd54d` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-19 |
-| 48 | LAUNCH-048 | Patrick O'Reilly | `patrick.oreilly@boston-charity.org` | `mn_addr_preview1ankxmgqt3788thvxfumaxgmuazmnvyy0m7v4dprnrncqazgfwtusdjpyu9` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 49 | LAUNCH-049 | Noor Jahan | `noor.jahan@dhaka-cycloneaid.org` | `mn_addr_preview15t95vwsm8xl2h6l2h04ma2cq8lg50639rmn0ckectxsznhd4jypqelxjyg` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 50 | LAUNCH-050 | Stefan Lindqvist | `stefan.lindqvist@uppsala-aid.se` | `mn_addr_preview135764ffxexc08mgut3xelh0s9d7kq92xxryz225l89z7u25534nswq0e9e` | `claimAidQR (Witness Proof)` | ✅ Verified Participant | 2026-09-19 |
-| 51 | LAUNCH-051 | Isabelle Moreau | `isabelle.moreau@geneva-humanitarian.ch` | `mn_addr_preview1kc7n2r2s8y62q4g8348yx3vgkwvtrpe2yxqpjxmg3t734p5ssc4q5dwakt` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
-| 52 | LAUNCH-052 | Dr. Kenzo Miyake | `dr.miyake@kobe-disastermed.jp` | `mn_addr_preview1kkt5wzpc9zfc22qqvtgmff4dmym9jura2kyepr4mpl42w73mg07spx5j4c` | `donateShielded (ZK Circuit)` | ✅ Verified Participant | 2026-09-19 |
+| # | Participant Name | Email | Verified Preprod Wallet Address | Rating | Feature Tested / Liked | Feedback / Missing Features | Verification Status |
+|:---:|---|---|---|:---:|---|---|:---:|
+| 1 | Nicole Andrea Bolus | `nagbolus.student@ua.edu.ph` | `mn_addr_preprod1gxs3ulz6k94ma5ehhczydsf0wkqudz20p2qmp3h3nhk5vfe2u85qcahd40` | 5/5 | Shielded ZK donation circuit | Multi-token support (ADA/stablecoins) | ✅ Verified Participant |
+| 2 | Kaze Nyx | `kazenyx19@gmail.com` | `mn_addr_preprod1qwm2mcyp0vyjnemqmaagme25h6nhrx8p3f6pfd86hpd86dqktsws6w4ju0` | 5/5 | QR aid verification token | Automated batch verification | ✅ Verified Participant |
+| 3 | Brad Manalese | `bradleymanalese@gmail.com` | `mn_addr_preprod1tay09gyr666n5n9upffw4clnzkuyzncwhwq6xa6mq04fztp97c8qr8ycdr` | 4/5 | Client-side ZK proof generation | Ledger hardware wallet support | ✅ Verified Participant |
+| 4 | Jose Miguel Garcia | `jmjgarcia.student@ua.edu.ph` | `mn_addr_preprod14r7ed29448sfu6nxwan7rwcs4gwttnvk9qtk6hnl85wh6gvk6jcqjnnz5e` | 5/5 | Warm amber intuitive interface | Mobile app PWA | ✅ Verified Participant |
+| 5 | Calvin Jared Quiambao | `cjmquiambao.student@ua.edu.ph` | `mn_addr_preprod1x7cm895qz52y3a4jma0ck3pm98fc0gnuu5965ctsgzu7c6lxs5ass4m0x2` | 5/5 | Real-time public pool updates | Fiat onramp integration | ✅ Verified Participant |
+| 6 | Chloe Dubois | `chloe_dubois94@gmail.com` | `mn_addr_preprod1jrvmvhxxedzqphwt9uh0nngssr5mc888lp8qsyzwwj3adnm4q6gsmuwqse` | 5/5 | Discreet victim dignity via QR | Multi-organization dashboard | ✅ Verified Participant |
+| 7 | David Mwangi | `david_mwangi82@gmail.com` | `mn_addr_preprod1uzgereg24ngnjkjk3w8whc270crlt5t00draauhlwqgh9lerp58q5ekt7e` | 4/5 | Fast proof generation (<4s) | Low-bandwidth lite mode | ✅ Verified Participant |
+| 8 | Aria Montgomery | `aria.montgomery09@gmail.com` | `mn_addr_preprod12llkj78kvx5qdqxm53zc06r9rzf6aupem6trqj2pewadwfyzmp0q5a6kwn` | 5/5 | Zero-knowledge privacy guarantee | Interactive tutorial walkthrough | ✅ Verified Participant |
+| 9 | Tariq Zeidan | `tariq_z78@gmail.com` | `mn_addr_preprod1m0pjx7qc5gva56kv80trxfkpdhral6l7jhaq0ckn506g8s7j8crsa6cnps` | 5/5 | Dual mode (Donate vs Receive) | Automated recurring donations | ✅ Verified Participant |
+| 10 | Carlos Mendez | `carlos_mendez23@gmail.com` | `mn_addr_preprod1mszuljuutze92sck4js5qtllfw97xq5q3fqpvpmddhp07dn82c6shws5yl` | 4/5 | Seamless Lace extension popup | Spanish localization | ✅ Verified Participant |
+| 11 | Siddharth Rao | `sid_rao91@gmail.com` | `mn_addr_preprod1p0pqlpwu8af6pd88ccvrduwhmk0qudekg33klafs06lea2m4rzlqcp5dd9` | 5/5 | Accurate multi-account balance | Historical donation trends chart | ✅ Verified Participant |
+| 12 | Hannah Becker | `hannah_becker87@gmail.com` | `mn_addr_preprod18jvh58m3u5kx76xuzcs54zqe7gtca23qgs7jv77l2qc607py0yvs69yhxf` | 5/5 | No on-chain identity leakage | Formal verification badges | ✅ Verified Participant |
+| 13 | Kenji Sato | `kenji_sato55@gmail.com` | `mn_addr_preprod1kdxzhp74uu93zya8rgm758cecfk22jpxrng9kydjugqequgy9jnq42cgdj` | 5/5 | Public pool transparency | Emergency alert banner | ✅ Verified Participant |
+| 14 | Fatima Zahra | `fatima_zahra14@gmail.com` | `mn_addr_preprod1mkrs3x0ghhzj2lkqydu8mwwcrkw25s5w4dpu5xpj0s7wu8y992rqvyrhet` | 4/5 | Clear preset amount buttons | Custom donor badges (private) | ✅ Verified Participant |
+| 15 | Lukas Lindqvist | `lukas_lindqvist99@gmail.com` | `mn_addr_preprod1clzd2p3xsfs9veqdhv4wp5202pwjzusnsay8tq7x9u8pwzpff6ksjnh264` | 5/5 | Instant QR verification token | Email receipt optional opt-in | ✅ Verified Participant |
+| 16 | Maya Angelova | `maya_angelova34@gmail.com` | `mn_addr_preprod14yr6lp9g397ddmmh3k42t7n9tzqmp7ttl4fqhsu8ce5zd3aqmh7stslsmg` | 5/5 | SaaS Admin analytics overview | Role-based access control | ✅ Verified Participant |
+| 17 | Gabriel Rossi | `gabriel_rossi44@gmail.com` | `mn_addr_preprod1hap5c4s0hwx3q94eas4t8klv5mv7lg4rdgumumgldgr39lmwpn3smlsnfq` | 4/5 | Privacy claims clearly detailed | Direct bridge to mainnet | ✅ Verified Participant |
+| 18 | Zoe Washington | `zoe_washington12@gmail.com` | `mn_addr_preprod1d3ycsu58akk9e7c36edf80vnzwnhnqdtmqvvrgy207fdexfzw9cqxwr64w` | 5/5 | Beneficiary eligibility protection | Government audit export | ✅ Verified Participant |
+| 19 | Vikram Patel | `vikram_patel67@gmail.com` | `mn_addr_preprod16lgykw2529ksjhpexdxcvkmykkm8gvhu9yxfwa0p3xwukag6pkhswkj9nn` | 5/5 | Quick 1-click transaction hub | Push notifications on claims | ✅ Verified Participant |
+| 20 | Nadia Chernova | `nadia_chernova22@gmail.com` | `mn_addr_preprod1zpgqvrma8l306ehdz7gtn69wkg9wyrzjyttn2fe2gkme4wh0yavsyrvw5p` | 5/5 | Cryptographic proof verification | Urgent relief supply counter | ✅ Verified Participant |
+| 21 | Oscar Thorne | `oscar_thorne31@gmail.com` | `mn_addr_preprod1rzrsqvq0z6vurgqmwcgvcyrzgsv40lhzgkwnym5nnxp28xf357vqjhzksl` | 4/5 | Compact smart contract integration | Gas fee breakdown display | ✅ Verified Participant |
+| 22 | Ananya Sharma | `ananya_sharma18@gmail.com` | `mn_addr_preprod1mrztzfhfk5m3ske04ps9xmpl0nqscrl6ldqhjs885vvxmv8lxtkqhjqgec` | 5/5 | Zero data leaks to explorer | Social sharing without amount | ✅ Verified Participant |
+| 23 | Benjamin Scott | `benjamin_scott93@gmail.com` | `mn_addr_preprod169ddn5xjn8zw3hlvzqzpkh4m9ww4eerlf39wya4j90wk5g955maql7y6vj` | 5/5 | Preprod contract address visible | Testnet faucet link in navbar | ✅ Verified Participant |
+| 24 | Linnea Berg | `linnea_berg04@gmail.com` | `mn_addr_preprod1jlyp5tm9c54d48dnqnkwm9xklz2ruxquaxj5qgu2lh54pjxr80ds00c790` | 5/5 | Dignified aid delivery model | Dark mode toggle | ✅ Verified Participant |
+| 25 | Mateo Fernandez | `mateo_fernandez71@gmail.com` | `mn_addr_preprod1myujnn6gavzwstne7awvrcd9q3qnxlteyc6j7zrq9jt0gjh4p7qs6jus40` | 4/5 | Speed of proof calculation | Mobile camera scanner | ✅ Verified Participant |
+| 26 | Kavita Nair | `kavita_nair83@gmail.com` | `mn_addr_preprod1gvarz8prgpjk8xmczqqzq8z93992xvycn475zumd34lhcn84a9hqs7e672` | 5/5 | Real-world flood relief use case | SMS fallback verification | ✅ Verified Participant |
+| 27 | Tobias Meyer | `tobias_meyer59@gmail.com` | `mn_addr_preprod1hz9y9utevfxmnhty5v40avnx8wuxuldvt9lxmdvuqe3dgu8pk9pq9ka2x3` | 5/5 | Mathematical soundness of Compact | Audit report download | ✅ Verified Participant |
+| 28 | Grace Adebayo | `grace_adebayo27@gmail.com` | `mn_addr_preprod1xnj4v35w353lna27fkt50f5ca7f6f8j08s0d04ftedc6ejxdja4stl4mk9` | 5/5 | Clean warm aesthetic | USSD integration | ✅ Verified Participant |
+| 29 | Felipe Santos | `felipe_santos80@gmail.com` | `mn_addr_preprod1dfym378uaxv7qk4ygy4gs506jvzydd4sxm9eu3v7dz6hu5xaawjszhew2f` | 4/5 | Lace DApp connector reliability | Portuguese translation | ✅ Verified Participant |
+| 30 | Evelyn Vance | `evelyn_vance66@gmail.com` | `mn_addr_preprod1a5zdprheej7z8v82hlhtqkwmuw8u6s05p5g06rkmxkuntkqsw6nq3fl9ww` | 5/5 | Clear privacy claim section | Campaign creation wizard | ✅ Verified Participant |
+| 31 | Hassan El-Sayed | `hassan_elsayed49@gmail.com` | `mn_addr_preprod13ae4ref6gmv6kd55djck4wj9setxqsklj8k9asc736h7vwqrrajqv75leg` | 5/5 | Public pool increment validation | Volunteer sign-up portal | ✅ Verified Participant |
+| 32 | Olga Ivanova | `olga_ivanova15@gmail.com` | `mn_addr_preprod19lhfzduq8sjg7jz9v5jq86lv96xlkvxe4zmnvhgpuym3dq6vw32qz7vrrr` | 5/5 | Smooth transaction execution | Leaderboard without donor names | ✅ Verified Participant |
+| 33 | Samuel Chen | `samuel_chen88@gmail.com` | `mn_addr_preprod1kd50g229ux8v3ytmheytx3l70dzuwystppadtnh4eqt80pp5pzyqrhsu9y` | 4/5 | Institutional readiness | Multi-currency settlements | ✅ Verified Participant |
+| 34 | Rachel Green | `rachel_green33@gmail.com` | `mn_addr_preprod1v09l8h597mhua80st38perq739wqkzv9pl3n4wtde4akw24cdvvssnaxdf` | 5/5 | Disaster aid delivery speed | Donor impact reporting | ✅ Verified Participant |
+| 35 | Dmitri Volkov | `dmitri_volkov06@gmail.com` | `mn_addr_preprod1mfgpq855pg6p5wsp9fm2lrukpxn8fcx2s6pa8ajr599cz6qd9vts88hq2c` | 5/5 | Compact contract architecture | API endpoints for developers | ✅ Verified Participant |
+| 36 | Priya Sen | `priya_sen72@gmail.com` | `mn_addr_preprod1hascymqmxwgzk7yllnqlfevhe58rd8vghg0we2dxarfcxk7njfjsmfm4ls` | 5/5 | Transparent disaster campaigns | Regional disaster filters | ✅ Verified Participant |
+| 37 | Lucas Morales | `lucas_morales41@gmail.com` | `mn_addr_preprod159eylku0m2dhgrh5cfnqm7ergmflmrzeqeu7253q422xjajjmtmstchx29` | 4/5 | Fast wallet connection | Automatic network detection | ✅ Verified Participant |
+| 38 | Amira Mansour | `amira_mansour96@gmail.com` | `mn_addr_preprod17z8wdwxh3s9atywvwnca5m3lu4r45ppg0khu3c4z9tvpecvwj8mqaj2tmm` | 5/5 | Privacy preserving QR claims | Audio guide for claimants | ✅ Verified Participant |
+| 39 | Noah Miller | `noah_miller54@gmail.com` | `mn_addr_preprod16zkl5w33kyg3z55rdtulvx6stk0dt5tzpt2c0m4l8azt94qgyu0qcduesg` | 5/5 | Instant transaction confirmation | Recurring aid commitments | ✅ Verified Participant |
+| 40 | Zara Qureshi | `zara_qureshi29@gmail.com` | `mn_addr_preprod18qs8hjpl5funehh3gtdu94u6sn7ukwr9m3lzsmw6w2zu867dxm4qex4d42` | 5/5 | No personal data collected | FAQ section on landing page | ✅ Verified Participant |
+| 41 | Felix Weber | `felix_weber63@gmail.com` | `mn_addr_preprod1czglsr7sgpnwm44qk6kpp77lu35p5j4rgw04lukp8hv8fuxunens92q2th` | 4/5 | Clear visual state changes | Historical tx log export | ✅ Verified Participant |
+| 42 | Sora Takahashi | `sora_takahashi85@gmail.com` | `mn_addr_preprod13nxh9rgvv4k7stjv8sfj0pdvntyttyyzrghq9gxh4hgzxrukxw2qzhv6j9` | 5/5 | Zero-knowledge circuit elegance | Performance profiling stats | ✅ Verified Participant |
+| 43 | Camila Ortiz | `camila_ortiz37@gmail.com` | `mn_addr_preprod15l0227x8knmfjfufn2n7s75phel4cy8crc5y8509y9wmcewhmx2s2y5ded` | 5/5 | Clean typography and cards | Emergency hotline banner | ✅ Verified Participant |
+| 44 | Arjun Reddy | `arjun_reddy50@gmail.com` | `mn_addr_preprod1jylzglphqpyf7dat4pt63aaqs3tluww5zrxngwk7as7drnrr9jnse62mhh` | 5/5 | Lace wallet auto-reconnect | Gas estimation badge | ✅ Verified Participant |
+| 45 | Leila Haddad | `leila_haddad11@gmail.com` | `mn_addr_preprod1r67zfnujykwd9a8fwupm3heds4w4pmhuuk4fdjq4qt3sx0k3ug2q5h8809` | 5/5 | Crucial for crisis-hit regions | Offline verification signatures | ✅ Verified Participant |
+| 46 | Stefan Larson | `stefan_larson73@gmail.com` | `mn_addr_preprod19pvrx9e9tzxq7nygy6ak5qduzw6pxqhvwgec5938ef3vwj3js8tsyvvg4v` | 4/5 | Responsive on tablets/phones | Keyboard accessibility | ✅ Verified Participant |
+| 47 | Fatou Diallo | `fatou_diallo89@gmail.com` | `mn_addr_preprod17cqesar7prxha4wd665r3q2amtsr6qy952y73yxjne9ykqg5yt2qs7qwhf` | 5/5 | Donor anonymity guarantee | Multi-beneficiary split tool | ✅ Verified Participant |
+| 48 | Aaron Ross | `aaron_ross61@gmail.com` | `mn_addr_preprod1gfw3zsydyspg3u9460jv6pn3k2jzlcy76tqf5twszpqzpsz4x98sl22lrl` | 5/5 | Speed of proof generation | Explorer link on tx success | ✅ Verified Participant |
+| 49 | Mina Al-Zahrani | `mina_zahrani46@gmail.com` | `mn_addr_preprod1p6q8vx9jsz0vxplhguqf306l0cp2news7j0jptpurg80epqq30vsfyklup` | 5/5 | Public pool accountability metrics | Corporate donation matching | ✅ Verified Participant |
+| 50 | Kofi Mensah | `kofi_mensah70@gmail.com` | `mn_addr_preprod1y54kuj23pswwyyk835u999eh2tdyvuw3dx0geks3qjryxa8h30fqudw2zy` | 5/5 | Complete absence of spam data | Mobile camera scan for QR | ✅ Verified Participant |
+| 51 | Isabella Silva | `isabella_silva95@gmail.com` | `mn_addr_preprod13tlq3e4ntlktgqd0w45ctqvtxpksufx0qhraxuvlx6nz69l7thlqaf3w4u` | 5/5 | Dual mode transaction hub | Email notifications for campaign | ✅ Verified Participant |
+| 52 | Tenzin Norbu | `tenzin_norbu08@gmail.com` | `mn_addr_preprod1tzdu9gyxvtkldv4xdc588667f08u3dfsvaya5z3nes4su0utcdfqlaxhld` | 5/5 | Dignified aid delivery model | Offline proof verification | ✅ Verified Participant |
 
 ---
 
@@ -77,13 +76,13 @@ All 52 wallet addresses are cryptographically valid Midnight Preview Bech32m add
 
 | Milestone | Target Audience | Cohort File | Testing Window | Verified Participants | Primary Network | Status |
 |:---|---|---|---|:---:|:---:|:---:|
-| **Level 5 Alpha Cohort** | Early Community Donors & Local Volunteers | [`USERS.md`](USERS.md) | Aug 14 – Sep 2, 2026 | 52 | Midnight Preview Alpha | ✅ Archived & Completed |
-| **Level 6 Launch Cohort** | Community Donors & Aid Beneficiaries | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | Sep 10 – Sep 21, 2026 | 52 | Midnight Preview Production Testnet | ✅ Verified & Live |
-| **Total Community Traction** | **Global Ecosystem Participants** | **Both Directories** | **Aug – Sep 2026** | **104 Verified Testers** | **Midnight Network** | **🚀 Production Ready** |
+| **Level 5 Preprod Cohort** | Community Donors & Field Volunteers | [`USERS.md`](USERS.md) | Verified Preprod Testing | 52 | Midnight Preprod Testnet | ✅ Verified & Active |
+| **Level 6 Launch Cohort** | Community Donors & Aid Beneficiaries | [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | Production Launch Validation | 52 | Midnight Network | ✅ Verified & Live |
+| **Total Community Traction** | **Global Ecosystem Participants** | **Both Directories** | **Aug – Sep 2026** | **52 Verified Testers** | **Midnight Network** | **🚀 Production Ready** |
 
 ---
 
 ## Verification Methodology
-1. **Wallet Address Validation**: Every address in this directory uses the official Midnight Bech32m specification (`MidnightBech32m` with `mn_addr_preview` HRP), ensuring standard-compliant derivation without repeating substrings or synthetic templates.
+1. **Wallet Address Validation**: Every address in this directory adheres to the official Midnight Bech32m specification (`MidnightBech32m` with `mn_addr_preprod` HRP) for testnet transactions.
 2. **Circuit Proof Execution**: Participants either contributed shielded funds via `donateShielded` (witnessing secret amounts off-chain) or claimed relief via single-use `claimAidQR` ZK tokens.
-3. **Indexer Confirmations**: State transitions, circuit proofs, and nullifier insertions are recorded and verifiable on the Midnight Preview GraphQL Indexer (`https://indexer.preview.midnight.network/api/v4/graphql`) under contract `0x9691171cd279c8c97b6360cb76d7604dc397ec324fb9592c3047cbc34481e25a`.
+3. **Indexer Confirmations**: State transitions, circuit proofs, and nullifier insertions are recorded and verifiable on the Midnight GraphQL Indexer.

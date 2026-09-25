@@ -338,10 +338,3 @@ export const initialChartData = [
   { name: 'Sat', Requests: 110, Completed: 88, Pending: 22 },
   { name: 'Sun', Requests: 125, Completed: 104, Pending: 21 },
 ];
-
-// Compatibility aliases
-export const mockRequests = initialRequests;
-export const mockActivities = initialActivities;
-export const mockUsers = initialUsers;
-export const mockNotifications = initialNotifications;
-export const mockChartData = initialChartData;
