@@ -12,6 +12,8 @@ import { recordGlobalDonation } from '../utils/supabase';
 import { Contract } from '../../contracts/managed/reliefshield/contract/index.js';
 import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
+import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { createBrowserProviders } from '../utils/midnightProviders';
 
 /**
  * Custom Hook for Midnight Lace Wallet Connection & ReliefShield ZK Circuit Execution
@@ -569,79 +571,52 @@ export function useMidnight() {
         for (let i = 0; i < 32; i++) nullifierBytes[i] = Math.floor(Math.random() * 256);
       }
 
-      // 1. Instantiate the generated ReliefShield Compact contract & execute donateShielded circuit
+      // 1. Instantiate the generated ReliefShield Compact contract
       const deployedContractAddress = getDeployedContractAddress(walletState.network);
       console.log(`[ReliefShield ZK] Binding to deployed contract at ${deployedContractAddress}...`);
 
-      const contract = new Contract({});
+      const compiledContract = CompiledContract.make('reliefshield', Contract).pipe(
+        CompiledContract.withVacantWitnesses,
+      );
 
-      // 2. Configure official private state provider
-      const privateStateProvider = {
-        get: async (key: string) => {
-          if (typeof window === 'undefined') return null;
-          const val = localStorage.getItem(`reliefshield_private_state_${key}`);
-          return val ? JSON.parse(val) : null;
-        },
-        set: async (key: string, state: any) => {
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(`reliefshield_private_state_${key}`, JSON.stringify(state));
-          }
-        },
-        clear: async (key: string) => {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem(`reliefshield_private_state_${key}`);
-          }
-        }
-      };
+      // 2. Configure official providers (proof provider, level-backed private state provider, indexer public data provider)
+      const providers = await createBrowserProviders(apiInstance, walletState.network);
 
-      // 3. Obtain current contract state from Midnight Indexer or initialize authentic contract state
-      let contractStateData: any = null;
+      // 3. Connect to deployed contract using official findDeployedContract()
+      console.log(`[ReliefShield ZK] Calling findDeployedContract for ${deployedContractAddress}...`);
+      let deployed: any = null;
       try {
-        const indexerRes = await queryIndexerContractState(deployedContractAddress, walletState.network);
-        if (indexerRes?.state) {
-          const hex = indexerRes.state.replace(/^0x/, '');
-          const bytes = compactRuntime.fromHex(hex);
-          try {
-            const onchain = await import('@midnight-ntwrk/onchain-runtime-v3');
-            const cs = onchain.ContractState.deserialize(bytes);
-            contractStateData = cs.data;
-          } catch {
-            const decoded = compactRuntime.StateValue.decode(bytes);
-            contractStateData = new compactRuntime.ChargedState(decoded);
-          }
-        }
-      } catch (idxErr) {
-        console.warn('[ReliefShield ZK] Indexer state query notice:', idxErr);
-      }
-
-      if (!contractStateData) {
-        const constructorCtx = {
+        deployed = await findDeployedContract(providers as any, {
+          compiledContract: compiledContract as any,
+          contractAddress: deployedContractAddress,
+          privateStateId: 'reliefshieldPrivateState',
           initialPrivateState: {},
-          initialZswapLocalState: { coinPublicKey: new Uint8Array(32) },
-        };
-        const initialRes = contract.initialState(constructorCtx, new Uint8Array(32));
-        contractStateData = initialRes.currentContractState.data;
+        });
+        console.log('[ReliefShield ZK] findDeployedContract connected successfully!');
+      } catch (findErr) {
+        console.warn('[ReliefShield ZK] findDeployedContract notice:', findErr);
       }
 
-      // 4. Execute generated donateShielded circuit passing secretAmount and secretNonce
-      const circuitContext = compactRuntime.createCircuitContext(
-        compactRuntime.dummyContractAddress(),
-        new Uint8Array(32),
-        contractStateData,
-        {}
-      );
+      // Query DUST status from wallet for diagnostics
+      if (apiInstance && typeof apiInstance.getDustBalance === 'function') {
+        try {
+          const d = await apiInstance.getDustBalance();
+          if (d && typeof d.balance === 'bigint') {
+            const dustBal = d.balance;
+            console.log(`[Lace] Current DUST balance: ${dustBal.toLocaleString()} (Cap: ${d.cap?.toLocaleString()})`);
+            if (dustBal === 0n) {
+              console.warn('[Lace] WARNING: Wallet DUST balance is 0. Contract transactions require DUST to pay network gas fees.');
+            }
+          }
+        } catch (dErr) {
+          console.warn('[Lace] getDustBalance query notice:', dErr);
+        }
+      }
 
-      const circuitExecution = contract.circuits.donateShielded(
-        circuitContext,
-        BigInt(secretAmount),
-        nullifierBytes
-      );
-
-      console.log('[ReliefShield ZK] Local witness & partial proof generated:', {
-        hasProofData: Boolean(circuitExecution.proofData),
-        inputLength: circuitExecution.proofData?.input?.value?.length,
-        nullifierHex: Array.from(nullifierBytes).map((b) => b.toString(16).padStart(2, '0')).join(''),
-      });
+      // Read configuration and tip height before contract transaction submission
+      const activeConfig = walletState.network === 'preprod' ? PREPROD_CONTRACT_CONFIG : RELIEF_SHIELD_CONTRACT_CONFIG;
+      const destination = activeConfig.treasuryAddress;
+      const startHeight = await getCurrentBlockHeight(walletState.network);
 
       // Brief pause to allow the user to observe witness generation in the UI
       await new Promise((r) => setTimeout(r, 600));
@@ -649,63 +624,59 @@ export function useMidnight() {
       // Transition to awaiting signature in Lace wallet
       setCircuitStage('awaiting_signature');
 
-      // 4. Submit genuine Midnight contract transaction via DApp Connector API
-      if (apiInstance) {
-        // Query DUST status for diagnostics
-        let dustBalance: bigint | null = null;
-        if (typeof apiInstance.getDustBalance === 'function') {
+      let txSubmission: any = null;
+
+      // 4. Call generated donateShielded passing secretAmount and secretNonce through genuine contract transaction flow
+      if (deployed?.callTx?.donateShielded) {
+        try {
+          console.log('[ReliefShield ZK] Executing deployed.callTx.donateShielded with private witness...');
+          const callResult = await deployed.callTx.donateShielded(specks, nullifierBytes);
+          console.log('[ReliefShield ZK] Contract transaction confirmed via callTx:', callResult);
+
+          if (callResult?.public?.txId) {
+            realTxHash = callResult.public.txId.startsWith('0x') ? callResult.public.txId : `0x${callResult.public.txId}`;
+          } else if (callResult?.txId) {
+            realTxHash = callResult.txId.startsWith('0x') ? callResult.txId : `0x${callResult.txId}`;
+          }
+          txSubmission = callResult;
+        } catch (callErr: any) {
+          console.warn('[ReliefShield ZK] deployed.callTx.donateShielded notice:', callErr);
+        }
+      }
+
+      // 5. Fallback if callTx is pending submission via Lace DApp Connector relayer
+      if (!realTxHash && apiInstance) {
+        if (typeof apiInstance.balanceUnsealedTransaction === 'function') {
           try {
-            const d = await apiInstance.getDustBalance();
-            if (d && typeof d.balance === 'bigint') {
-              dustBalance = d.balance;
-              console.log(`[Lace] Current DUST balance: ${dustBalance.toLocaleString()} (Cap: ${d.cap?.toLocaleString()})`);
-              if (dustBalance === 0n) {
-                console.warn('[Lace] WARNING: Wallet DUST balance is 0. Transactions require DUST to pay network gas fees.');
+            console.log('[Lace] Balancing unsealed contract transaction in Lace wallet...');
+            const unsealedPayload = JSON.stringify({
+              contractAddress: deployedContractAddress,
+              circuit: 'donateShielded',
+              amount: secretAmount,
+              nullifier: Array.from(nullifierBytes).map((b) => b.toString(16).padStart(2, '0')).join(''),
+            });
+            const balanced = await apiInstance.balanceUnsealedTransaction(unsealedPayload, { payFees: true });
+            if (balanced?.tx) {
+              if (typeof apiInstance.submitTransaction === 'function') {
+                await apiInstance.submitTransaction(balanced.tx);
               }
+              txSubmission = balanced;
             }
-          } catch (dErr) {
-            console.warn('[Lace] getDustBalance query failed:', dErr);
+          } catch (unsealedErr) {
+            console.warn('[Lace] balanceUnsealedTransaction notice:', unsealedErr);
           }
         }
 
-        // Read tip height before contract transaction submission
-        const startHeight = await getCurrentBlockHeight(walletState.network);
-
-        // Execute transaction via Lace DApp Connector:
-        const activeConfig = walletState.network === 'preprod' ? PREPROD_CONTRACT_CONFIG : RELIEF_SHIELD_CONTRACT_CONFIG;
-        const destination = activeConfig.treasuryAddress;
-        const tokenType = '0000000000000000000000000000000000000000000000000000000000000000';
-        const desiredOutputs = [
-          {
-            kind: 'unshielded' as const,
-            type: tokenType,
-            value: specks,
-            recipient: destination,
-          }
-        ];
-
-        let txSubmission: any = null;
-
-        if (typeof apiInstance.makeTransfer === 'function') {
-          try {
-            console.log('[Lace] Requesting transaction approval in Lace wallet...');
-            txSubmission = await apiInstance.makeTransfer(desiredOutputs, { payFees: true });
-            console.log('[Lace] Transaction approved and sealed in Lace wallet:', txSubmission);
-          } catch (mErr: any) {
-            console.warn('[Lace] makeTransfer error:', mErr);
-            throw mErr;
-          }
-        }
-
-        // In Midnight Lace, some versions require submitTransaction to broadcast
-        if (typeof apiInstance.submitTransaction === 'function' && txSubmission?.tx) {
+        // Broadcast transaction if needed
+        if (typeof apiInstance.submitTransaction === 'function' && txSubmission?.tx && !realTxHash) {
           try {
             await apiInstance.submitTransaction(txSubmission.tx);
             console.log('[Lace] Transaction submitted to Midnight consensus network!');
           } catch (subErr: any) {
-            console.warn('[Lace] submitTransaction notice (wallet may have broadcasted directly):', subErr?.message || subErr);
+            console.warn('[Lace] submitTransaction notice:', subErr?.message || subErr);
           }
         }
+      }
 
         setCircuitStage('submitting');
 
@@ -773,7 +744,6 @@ export function useMidnight() {
             }
           }
         }
-      }
 
       // No fake fallback hashes — if the transaction was not confirmed, throw a real error
       if (!realTxHash) {
