@@ -132,9 +132,10 @@ export async function readTotalReliefPoolFromIndexer(
     try {
       const onchain = await import('@midnight-ntwrk/onchain-runtime-v3');
       const cs = onchain.ContractState.deserialize(bytes);
-      const decodedLedger = ledger(cs.data);
+      const decodedLedger = ledger(cs.data as any);
       poolVal = Number(decodedLedger.totalReliefPool);
-    } catch {
+    } catch (firstErr) {
+      console.warn('[Indexer] ContractState.deserialize error:', firstErr);
       const stateValue = StateValue.decode(bytes);
       const decodedLedger = ledger(stateValue);
       poolVal = Number(decodedLedger.totalReliefPool);

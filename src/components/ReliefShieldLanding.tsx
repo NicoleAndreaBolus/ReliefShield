@@ -18,6 +18,8 @@ import {
   Eye,
   ExternalLink
 } from 'lucide-react';
+import { LiveTransactionsFeed } from './LiveTransactionsFeed';
+import { PrivacyMatrix } from './PrivacyMatrix';
 
 interface ReliefShieldLandingProps {
   isConnected: boolean;
@@ -322,6 +324,9 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
         </div>
       </section>
 
+      {/* Live Verified On-Chain Transactions Feed */}
+      <LiveTransactionsFeed network={network as any} latestTxHash={txResultHash} />
+
       {/* 4-Step How It Works Section */}
       <section id="how-it-works" className="w-full max-w-7xl mx-auto px-6 py-24 text-center border-t border-[#EFEBE6]">
         <div className="mb-16">
@@ -457,6 +462,9 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
           </div>
         </div>
       </section>
+
+      {/* Official Privacy Claim & Audit Matrix */}
+      <PrivacyMatrix network={network as any} />
 
       {/* Footer */}
       <footer className="w-full bg-[#1C1917] text-white py-12 border-t border-stone-800 text-xs">

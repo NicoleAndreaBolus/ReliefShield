@@ -1,8 +1,18 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const rawUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const getEnv = (key: string): string => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+    return String(import.meta.env[key]);
+  }
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return String(process.env[key]);
+  }
+  return '';
+};
+
+const rawUrl = getEnv('VITE_SUPABASE_URL').trim();
 const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY').trim();
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
@@ -63,7 +73,8 @@ export async function fetchRecentDonations(
       return [];
     }
 
-    return (data || []) as GlobalDonation[];
+    const rows = (data || []) as GlobalDonation[];
+    return rows.filter((r) => !r.tx_hash.startsWith('0xfe34') && !r.tx_hash.startsWith('0x5e2a'));
   } catch (err) {
     console.warn('[Supabase] Failed to fetch donations:', err);
     return [];
