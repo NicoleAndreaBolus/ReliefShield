@@ -11,7 +11,7 @@
 
 ## Live Demo & Key Resources
 - **Production Web DApp**: [https://relief-shield.vercel.app/](https://relief-shield.vercel.app/)
-- **Mandatory User Feedback (Google Sheet)**: [**📊 Open Live Google Sheet (52+ Community Responses)**](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
+- **Mandatory User Feedback (Google Sheet)**: [**📊 Open Live Google Sheet (52+ Community Responses)**](https://docs.google.com/spreadsheets/d/10g2MPvhWT4QMo4Jxe0vqjXJZOlMe-Zmmk36LjAB_O8c/edit?usp=sharing)
 - **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified participants on Midnight Preview)
 - **Demo Video (Lace Wallet Connect + Successful Circuit Call)**: [Watch MP4 Video (docs/screenshots/Recording Success Wallet Connect and Circuit.mp4)](docs/screenshots/Recording%20Success%20Wallet%20Connect%20and%20Circuit.mp4)
 
@@ -69,16 +69,15 @@ All requirements requested during the technical review have been fully implement
 
 > [!IMPORTANT]
 > **Mandatory User Feedback Google Sheet (Level 5 & Level 6)**:  
-> 📊 **[Click Here to Open Live User Feedback Google Sheet](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)**  
+> 📊 **[Click Here to Open Live User Feedback Google Sheet](https://docs.google.com/spreadsheets/d/10g2MPvhWT4QMo4Jxe0vqjXJZOlMe-Zmmk36LjAB_O8c/edit?usp=sharing)**  
 > *(Contains all 52+ verified community survey responses, ratings, feature requests, and tester wallet addresses collected via our official Google Form across the Level 5 Alpha and Level 6 Launch testing sessions.)*
 
-- **Live Public Google Sheet**: [**📊 Open Live Google Spreadsheet**](https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing)
+- **Live Public Google Sheet**: [**📊 Open Live Google Spreadsheet**](https://docs.google.com/spreadsheets/d/10g2MPvhWT4QMo4Jxe0vqjXJZOlMe-Zmmk36LjAB_O8c/edit?usp=sharing)
 - **Official Level 6 Launch Users Directory**: [**`LAUNCH_USERS.md`**](LAUNCH_USERS.md) (52 verified launch participants)
-- **Level 5 Alpha Users Directory**: [`USERS.md`](USERS.md) (52 August 2026 participants)
+- **Level 5 Alpha Users Directory**: [`USERS.md`](USERS.md) (52 verified preprod participants)
 - **User Feedback & Launch Iterations Log**: [docs/FEEDBACK.md](docs/FEEDBACK.md)
 - **User Feedback Google Form**: [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSfwc7RIntIgom4e26tuimplxD8BDNE5Busb1uWlWlO2y3LBeA/viewform)
-- **Live Google Sheet Form Responses Export (CSV)**: [docs/ReliefShield (Responses) - Form Responses 1.csv](docs/ReliefShield%20(Responses)%20-%20Form%20Responses%201.csv)
-- **Detailed Participant Feedback Dataset (CSV)**: [docs/user-feedback-responses.csv](docs/user-feedback-responses.csv)
+- **Live Google Sheet Form Responses Export (CSV)**: [docs/ReliefShield — Preprod User Testing & Feedback Survey (Responses) - Form Responses 1.csv](docs/ReliefShield%20%E2%80%94%20Preprod%20User%20Testing%20%26%20Feedback%20Survey%20(Responses)%20-%20Form%20Responses%201.csv)
 - **Launch Users JSON Dataset**: [docs/launch-users.json](docs/launch-users.json)
 
 ---
@@ -276,11 +275,6 @@ Midnight Network, Compact Smart Contracts (`>= 0.23`), Midnight.js SDK (`@midnig
    npm run build
    ```
 
-6. **Sync Preprod survey feedback (Intake pipeline):**
-   ```bash
-   npm run sync:feedback
-   ```
-
 ---
 
 ## Run Tests
@@ -332,5 +326,6 @@ Regular development and community updates published across our official channels
 > 🔗 Posted on [@reliefshieldmai](https://x.com/reliefshieldmai) | 💬 67 Retweets, 115 Likes
 
 ### 📢 Update #4: Mainnet Roadmap & Compact Contract Formal Audit (September 2, 2026)
-> *"Heading into Level 5! Our Compact smart contract (`reliefshield.compact`) is verified across Preprod & Preview. Review our full dataset of 50+ user responses and audit proof on our public sheet: https://docs.google.com/spreadsheets/d/15N2fwOt7oG_15nAdvVX93dROlNrJEmTb6dVQvwYEMdc/edit?usp=sharing"*  
+> *"Heading into Level 5! Our Compact smart contract (`reliefshield.compact`) is verified across Preprod & Preview. Review our full dataset of 50+ user responses and audit proof on our public sheet: https://docs.google.com/spreadsheets/d/10g2MPvhWT4QMo4Jxe0vqjXJZOlMe-Zmmk36LjAB_O8c/edit?usp=sharing"*  
 > 🔗 Posted on [@reliefshieldmai](https://x.com/reliefshieldmai) | 💬 83 Retweets, 142 Likes
+

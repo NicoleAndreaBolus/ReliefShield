@@ -328,5 +328,35 @@ describe('ReliefShield Compact Smart Contract Circuits (Genuine Runtime)', () =>
         contract.circuits.donateShielded(replayCircuitCtx, secretAmount, secretNonce);
       }).toThrow(/Nullifier already used: replay rejected/);
     });
+
+    it('should reject an unauthorized resetPool transaction when an attacker submits an unauthorized key', async () => {
+      // 1. Initial Deployed Contract State with authorized admin
+      const authorizedAdmin = new Uint8Array(crypto.randomBytes(32));
+      const { contract, state: deployedState, privateState: initialPrivateState } = createInitialContract(authorizedAdmin);
+
+      // 2. Fund pool with a legitimate shielded donation
+      const secretNonce = new Uint8Array(crypto.randomBytes(32));
+      const donationTx = executeDonateShielded(contract, deployedState, initialPrivateState, 500n, secretNonce);
+      const stateWithFunds = donationTx.nextState;
+      expect(ledger(stateWithFunds).totalReliefPool).toBe(500n);
+
+      // 3. Attacker wallet generates random key to call resetPool
+      const attackerKey = new Uint8Array(crypto.randomBytes(32));
+      const attackerCaller = new Uint8Array(crypto.randomBytes(32));
+
+      // 4. Attacker attempts to build & execute resetPool CallTx transaction
+      expect(() => {
+        const attackerCircuitCtx = compactRuntime.createCircuitContext(
+          compactRuntime.dummyContractAddress(),
+          attackerCaller,
+          stateWithFunds,
+          donationTx.nextPrivateState,
+        );
+        contract.circuits.resetPool(attackerCircuitCtx, attackerKey, 0n);
+      }).toThrow(/Unauthorized: caller is not authorized admin/);
+
+      // 5. Authoritative ledger pool remains unchanged at 500
+      expect(ledger(stateWithFunds).totalReliefPool).toBe(500n);
+    });
   });
 });

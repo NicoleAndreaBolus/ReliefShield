@@ -360,11 +360,33 @@ export function recordDeployment(
     wallets: {},
     deployments: {},
   };
+  const deployedAt = new Date().toISOString();
   next.deployments = {
     ...next.deployments,
-    [network]: { address, deployer, deployedAt: new Date().toISOString() },
+    [network]: { address, deployer, deployedAt },
   };
   saveState(next, { cwd });
+
+  // Synchronize src/deployments.json so the frontend and contract utils use the genuine deployContract() output
+  try {
+    const deploymentsPath = path.join(cwd, 'src', 'deployments.json');
+    let jsonDeployments: Record<string, any> = {};
+    if (fs.existsSync(deploymentsPath)) {
+      try {
+        jsonDeployments = JSON.parse(fs.readFileSync(deploymentsPath, 'utf-8'));
+      } catch {
+        jsonDeployments = {};
+      }
+    }
+    jsonDeployments[network] = {
+      address,
+      deployer,
+      deployedAt,
+    };
+    fs.writeFileSync(deploymentsPath, `${JSON.stringify(jsonDeployments, null, 2)}\n`, 'utf-8');
+  } catch (err) {
+    console.warn('[network] Note: Could not update src/deployments.json:', (err as Error).message);
+  }
 }
 
 export function setActiveNetwork(network: NetworkId, opts: FsOptions = {}): void {
