@@ -25,3 +25,8 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Documentation working files & exports
+docs/preprod-addresses-column.txt
+docs/preview-addresses-column.txt
+docs/verified-wallet-addresses.json
