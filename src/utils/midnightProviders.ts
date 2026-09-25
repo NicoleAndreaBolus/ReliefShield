@@ -1,4 +1,3 @@
-import { ZKConfigProvider, createProverKey, createVerifierKey, createZKIR } from '@midnight-ntwrk/midnight-js-types';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
@@ -8,34 +7,41 @@ import { RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from './contra
 /**
  * Browser-compatible ZKConfigProvider that fetches prover keys, verifier keys,
  * and ZKIR assets over HTTP from the application's public assets directory.
+ * Implements the structural ZKConfigProvider interface without inheriting from
+ * midnight-js-types (avoiding ESM circular dependency / undefined class extension in browser bundles).
  */
-export class FetchZkConfigProvider extends ZKConfigProvider<string> {
+export class FetchZkConfigProvider {
   private baseUrl: string;
 
   constructor(baseUrl: string = '/reliefshield') {
-    super();
     this.baseUrl = baseUrl.replace(/\/$/, '');
   }
 
-  async getProverKey(circuitId: string) {
+  async getProverKey(circuitId: string): Promise<Uint8Array> {
     const res = await fetch(`${this.baseUrl}/keys/${circuitId}.prover`);
     if (!res.ok) {
       throw new Error(`Failed to fetch prover key for ${circuitId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
-    return createProverKey(new Uint8Array(buf));
+    return new Uint8Array(buf);
   }
 
-  async getVerifierKey(circuitId: string) {
+  async getVerifierKey(circuitId: string): Promise<Uint8Array> {
     const res = await fetch(`${this.baseUrl}/keys/${circuitId}.verifier`);
     if (!res.ok) {
       throw new Error(`Failed to fetch verifier key for ${circuitId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
-    return createVerifierKey(new Uint8Array(buf));
+    return new Uint8Array(buf);
   }
 
-  async getZKIR(circuitId: string) {
+  async getVerifierKeys(circuitIds: string[]): Promise<[string, Uint8Array][]> {
+    return Promise.all(
+      circuitIds.map(async (circuitId) => [circuitId, await this.getVerifierKey(circuitId)])
+    );
+  }
+
+  async getZKIR(circuitId: string): Promise<Uint8Array> {
     // Attempt .bzkir first, fall back to .zkir
     let res = await fetch(`${this.baseUrl}/zkir/${circuitId}.bzkir`);
     if (!res.ok) {
@@ -45,7 +51,7 @@ export class FetchZkConfigProvider extends ZKConfigProvider<string> {
       throw new Error(`Failed to fetch ZKIR for ${circuitId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
-    return createZKIR(new Uint8Array(buf));
+    return new Uint8Array(buf);
   }
 }
 
@@ -62,7 +68,7 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
   const zkConfigProvider = new FetchZkConfigProvider('/reliefshield');
 
   // 1. Official HTTP Client Proof Provider
-  const proofProvider = httpClientProofProvider(activeConfig.proofServerUrl, zkConfigProvider);
+  const proofProvider = httpClientProofProvider(activeConfig.proofServerUrl, zkConfigProvider as any);
 
   // 2. Official Indexer Public Data Provider
   const indexerWs = activeConfig.indexerUrl.replace(/^http/, 'ws');
