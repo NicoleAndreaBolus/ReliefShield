@@ -559,6 +559,13 @@ export function useMidnight() {
     setIsExecutingCircuit(true);
     setCircuitStage('generating_witness');
 
+    const handleStage = (e: any) => {
+      if (e.detail) setCircuitStage(e.detail);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('midnight:stage', handleStage);
+    }
+
     try {
       console.log(`[ReliefShield ZK] Executing donateShielded for ${secretAmount} tNIGHT...`);
       const specks = BigInt(Math.round(secretAmount * 1_000_000));
@@ -822,6 +829,10 @@ export function useMidnight() {
       }
 
       throw new Error(userFriendlyMsg);
+    } finally {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('midnight:stage', handleStage);
+      }
     }
   };
 
