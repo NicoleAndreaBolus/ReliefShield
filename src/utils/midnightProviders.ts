@@ -161,22 +161,28 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
   let shieldedInfo: any = null;
   try {
     shieldedInfo = await apiInstance?.getShieldedAddresses?.();
+    console.log('[Lace] Shielded keys retrieved:', {
+      hasCoinKey: !!(shieldedInfo?.shieldedCoinPublicKey || shieldedInfo?.coinPublicKey),
+      hasEncKey: !!(shieldedInfo?.shieldedEncryptionPublicKey || shieldedInfo?.encryptionPublicKey),
+    });
   } catch (err) {
     console.warn('[Lace] getShieldedAddresses warning:', err);
   }
 
-  const coinPublicKeyBytes = shieldedInfo?.coinPublicKey
-    ? fromHex(shieldedInfo.coinPublicKey.replace(/^0x/, ''))
-    : new Uint8Array(32);
+  const coinPublicKey: string =
+    shieldedInfo?.shieldedCoinPublicKey ||
+    shieldedInfo?.coinPublicKey ||
+    '00'.repeat(32);
 
-  const encPublicKeyBytes = shieldedInfo?.encryptionPublicKey
-    ? fromHex(shieldedInfo.encryptionPublicKey.replace(/^0x/, ''))
-    : new Uint8Array(32);
+  const encPublicKey: string =
+    shieldedInfo?.shieldedEncryptionPublicKey ||
+    shieldedInfo?.encryptionPublicKey ||
+    '00'.repeat(32);
 
   // 6. Wallet Provider & Midnight Provider bridged to Lace ConnectedAPI
   const walletProvider = {
-    getCoinPublicKey: () => coinPublicKeyBytes as any,
-    getEncryptionPublicKey: () => encPublicKeyBytes as any,
+    getCoinPublicKey: () => coinPublicKey as any,
+    getEncryptionPublicKey: () => encPublicKey as any,
     balanceTx: async (tx: any) => {
       console.log('[Lace] Balancing unsealed contract transaction in Lace wallet...');
       if (typeof apiInstance?.balanceUnsealedTransaction === 'function') {

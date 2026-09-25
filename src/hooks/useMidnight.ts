@@ -646,7 +646,8 @@ export function useMidnight() {
           }
           txSubmission = callResult;
         } catch (callErr: any) {
-          console.warn('[ReliefShield ZK] deployed.callTx.donateShielded notice:', callErr);
+          console.error('[ReliefShield ZK] deployed.callTx.donateShielded error:', callErr);
+          throw callErr;
         }
       }
 
