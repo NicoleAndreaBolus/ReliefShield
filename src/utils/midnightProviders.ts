@@ -19,18 +19,20 @@ export class FetchZkConfigProvider {
   }
 
   async getProverKey(circuitId: string): Promise<Uint8Array> {
-    const res = await fetch(`${this.baseUrl}/keys/${circuitId}.prover`);
+    const cleanId = circuitId.replace(/^.*\//, '').replace(/\.(prover|verifier|zkir|bzkir)$/, '');
+    const res = await fetch(`${this.baseUrl}/keys/${cleanId}.prover`);
     if (!res.ok) {
-      throw new Error(`Failed to fetch prover key for ${circuitId}: ${res.status} ${res.statusText}`);
+      throw new Error(`Failed to fetch prover key for ${cleanId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);
   }
 
   async getVerifierKey(circuitId: string): Promise<Uint8Array> {
-    const res = await fetch(`${this.baseUrl}/keys/${circuitId}.verifier`);
+    const cleanId = circuitId.replace(/^.*\//, '').replace(/\.(prover|verifier|zkir|bzkir)$/, '');
+    const res = await fetch(`${this.baseUrl}/keys/${cleanId}.verifier`);
     if (!res.ok) {
-      throw new Error(`Failed to fetch verifier key for ${circuitId}: ${res.status} ${res.statusText}`);
+      throw new Error(`Failed to fetch verifier key for ${cleanId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);
@@ -43,15 +45,43 @@ export class FetchZkConfigProvider {
   }
 
   async getZKIR(circuitId: string): Promise<Uint8Array> {
-    let res = await fetch(`${this.baseUrl}/zkir/${circuitId}.bzkir`);
+    const cleanId = circuitId.replace(/^.*\//, '').replace(/\.(prover|verifier|zkir|bzkir)$/, '');
+    let res = await fetch(`${this.baseUrl}/zkir/${cleanId}.bzkir`);
     if (!res.ok) {
-      res = await fetch(`${this.baseUrl}/zkir/${circuitId}.zkir`);
+      res = await fetch(`${this.baseUrl}/zkir/${cleanId}.zkir`);
     }
     if (!res.ok) {
-      throw new Error(`Failed to fetch ZKIR for ${circuitId}: ${res.status} ${res.statusText}`);
+      throw new Error(`Failed to fetch ZKIR for ${cleanId}: ${res.status} ${res.statusText}`);
     }
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);
+  }
+
+  async get(circuitId: string): Promise<any> {
+    const cleanId = circuitId.replace(/^.*\//, '').replace(/\.(prover|verifier|zkir|bzkir)$/, '');
+    console.log(`[ReliefShield ZK] Resolving ZK artifacts for circuit: ${cleanId}...`);
+    const [proverKey, verifierKey, zkir] = await Promise.all([
+      this.getProverKey(cleanId),
+      this.getVerifierKey(cleanId),
+      this.getZKIR(cleanId),
+    ]);
+    console.log(
+      `[ReliefShield ZK] Loaded ZK artifacts: prover=${proverKey.byteLength}B, verifier=${verifierKey.byteLength}B, zkir=${zkir.byteLength}B`
+    );
+    return {
+      circuitId: cleanId,
+      proverKey,
+      verifierKey,
+      zkir,
+    };
+  }
+
+  asKeyMaterialProvider() {
+    return {
+      getZKIR: (circuitId: string) => this.getZKIR(circuitId),
+      getProverKey: (circuitId: string) => this.getProverKey(circuitId),
+      getVerifierKey: (circuitId: string) => this.getVerifierKey(circuitId),
+    };
   }
 }
 
