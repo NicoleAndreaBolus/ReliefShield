@@ -195,7 +195,7 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
               <p className="text-xs text-[#78716C] font-normal mt-1">ZK Proof Verification Rate</p>
             </div>
             <div>
-              <p className="text-2xl font-black text-[#ea580c] font-mono">${counterState.toLocaleString()} tNIGHT</p>
+              <p className="text-2xl font-black text-[#ea580c] font-mono">{counterState.toLocaleString()} tNIGHT</p>
               <p className="text-xs text-[#78716C] font-normal mt-1">Total Public Relief Pool</p>
             </div>
           </div>
@@ -220,7 +220,7 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white p-4 rounded-xl border border-[#EFEBE6] shadow-sm">
                   <span className="text-[9px] font-bold text-[#78716C] uppercase tracking-wider block">Public Relief Pool</span>
-                  <span className="text-lg font-black text-[#ea580c] font-mono mt-1 block">${counterState.toLocaleString()}.00</span>
+                  <span className="text-lg font-black text-[#ea580c] font-mono mt-1 block">{counterState.toLocaleString()} tNIGHT</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-[#EFEBE6] shadow-sm relative overflow-hidden">
                   <span className="text-[9px] font-bold text-[#78716C] uppercase tracking-wider block">Privacy Protocol</span>

@@ -257,7 +257,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
             <div className="mt-4 p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFEBE6] flex items-center justify-between">
               <span className="text-xs text-[#78716C] font-medium">Public Relief Pool:</span>
-              <span className="text-xl font-extrabold text-[#ea580c] font-mono">${counterState.toLocaleString()} tNIGHT</span>
+              <span className="text-xl font-extrabold text-[#ea580c] font-mono">{counterState.toLocaleString()} tNIGHT</span>
             </div>
           </div>
 

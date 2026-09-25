@@ -139,7 +139,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-bold">
                   <span className="text-[#1C1917]">Shielded Contribution Amount (tNIGHT)</span>
-                  <span className="text-[#ea580c] font-mono">${counterState.toLocaleString()} Pool Balance</span>
+                  <span className="text-[#ea580c] font-mono">{counterState.toLocaleString()} tNIGHT Pool Balance</span>
                 </div>
 
                 <div className="relative">
