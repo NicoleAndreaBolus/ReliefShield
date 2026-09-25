@@ -127,9 +127,18 @@ export async function readTotalReliefPoolFromIndexer(
 
     const hex = state.replace(/^0x/, '');
     const bytes = fromHex(hex);
-    const stateValue = StateValue.decode(bytes);
-    const decodedLedger = ledger(stateValue);
-    const poolVal = Number(decodedLedger.totalReliefPool);
+    
+    let poolVal: number | null = null;
+    try {
+      const onchain = await import('@midnight-ntwrk/onchain-runtime-v3');
+      const cs = onchain.ContractState.deserialize(bytes);
+      const decodedLedger = ledger(cs.data);
+      poolVal = Number(decodedLedger.totalReliefPool);
+    } catch {
+      const stateValue = StateValue.decode(bytes);
+      const decodedLedger = ledger(stateValue);
+      poolVal = Number(decodedLedger.totalReliefPool);
+    }
 
     if (!isNaN(poolVal) && poolVal >= 0) {
       return { pool: poolVal, isStale: false };

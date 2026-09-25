@@ -600,8 +600,15 @@ export function useMidnight() {
         const indexerRes = await queryIndexerContractState(deployedContractAddress, walletState.network);
         if (indexerRes?.state) {
           const hex = indexerRes.state.replace(/^0x/, '');
-          const decoded = compactRuntime.StateValue.decode(compactRuntime.fromHex(hex));
-          contractStateData = new compactRuntime.ChargedState(decoded);
+          const bytes = compactRuntime.fromHex(hex);
+          try {
+            const onchain = await import('@midnight-ntwrk/onchain-runtime-v3');
+            const cs = onchain.ContractState.deserialize(bytes);
+            contractStateData = cs.data;
+          } catch {
+            const decoded = compactRuntime.StateValue.decode(bytes);
+            contractStateData = new compactRuntime.ChargedState(decoded);
+          }
         }
       } catch (idxErr) {
         console.warn('[ReliefShield ZK] Indexer state query notice:', idxErr);
