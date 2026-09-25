@@ -2,6 +2,7 @@ import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
+import { Transaction } from '@midnight-ntwrk/ledger-v8';
 import { RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from './contract';
 
 /**
@@ -186,10 +187,21 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
           const bytes = tx.serialize();
           payload = Array.from(bytes).map((b: number) => b.toString(16).padStart(2, '0')).join('');
         } else {
-          payload = JSON.stringify(tx);
+          throw new Error('Transaction provided to balanceTx does not support serialization');
         }
         const balanced = await apiInstance.balanceUnsealedTransaction(payload, { payFees: true });
-        return balanced?.tx || balanced;
+        const balancedHex = balanced?.tx || (typeof balanced === 'string' ? balanced : null);
+        if (balancedHex) {
+          try {
+            const rawBytes = fromHex(balancedHex.replace(/^0x/, ''));
+            const finalizedTx = Transaction.deserialize('signature', 'proof', 'binding', rawBytes);
+            return finalizedTx;
+          } catch (deserErr) {
+            console.warn('[Lace] FinalizedTransaction deserialization notice:', deserErr);
+            return balanced?.tx ? balanced.tx : balanced;
+          }
+        }
+        return balanced;
       }
       return tx;
     },
@@ -197,18 +209,46 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
       console.log('[Lace] Submitting contract transaction through Lace relayer...');
       if (typeof apiInstance?.submitTransaction === 'function') {
         let payload: string;
+        let txId: string = '';
         if (typeof tx === 'string') {
           payload = tx;
+          if (payload.length > 64) {
+            try {
+              const raw = fromHex(payload.replace(/^0x/, ''));
+              const hashBuf = await crypto.subtle.digest('SHA-256', raw);
+              txId = Array.from(new Uint8Array(hashBuf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+            } catch {}
+          } else {
+            txId = payload;
+          }
         } else if (tx && typeof tx.serialize === 'function') {
           const bytes = tx.serialize();
           payload = Array.from(bytes).map((b: number) => b.toString(16).padStart(2, '0')).join('');
+          if (typeof tx.transactionHash === 'function') {
+            try {
+              txId = tx.transactionHash();
+            } catch {}
+          }
+          if (!txId && typeof tx.identifiers === 'function') {
+            try {
+              const ids = tx.identifiers();
+              if (ids && ids.length > 0) txId = ids[0];
+            } catch {}
+          }
+          if (!txId) {
+            try {
+              const hashBuf = await crypto.subtle.digest('SHA-256', bytes);
+              txId = Array.from(new Uint8Array(hashBuf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+            } catch {}
+          }
         } else if (tx?.tx && typeof tx.tx === 'string') {
           payload = tx.tx;
+          txId = tx.txId || '';
         } else {
-          payload = JSON.stringify(tx);
+          payload = String(tx);
         }
         await apiInstance.submitTransaction(payload);
-        return payload;
+        return txId || payload;
       }
       throw new Error('Lace submitTransaction API is unavailable');
     },

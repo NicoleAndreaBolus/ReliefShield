@@ -650,40 +650,6 @@ export function useMidnight() {
         }
       }
 
-      // 5. Fallback if callTx is pending submission via Lace DApp Connector relayer
-      if (!realTxHash && apiInstance) {
-        if (typeof apiInstance.balanceUnsealedTransaction === 'function') {
-          try {
-            console.log('[Lace] Balancing unsealed contract transaction in Lace wallet...');
-            const unsealedPayload = JSON.stringify({
-              contractAddress: deployedContractAddress,
-              circuit: 'donateShielded',
-              amount: secretAmount,
-              nullifier: Array.from(nullifierBytes).map((b) => b.toString(16).padStart(2, '0')).join(''),
-            });
-            const balanced = await apiInstance.balanceUnsealedTransaction(unsealedPayload, { payFees: true });
-            if (balanced?.tx) {
-              if (typeof apiInstance.submitTransaction === 'function') {
-                await apiInstance.submitTransaction(balanced.tx);
-              }
-              txSubmission = balanced;
-            }
-          } catch (unsealedErr) {
-            console.warn('[Lace] balanceUnsealedTransaction notice:', unsealedErr);
-          }
-        }
-
-        // Broadcast transaction if needed
-        if (typeof apiInstance.submitTransaction === 'function' && txSubmission?.tx && !realTxHash) {
-          try {
-            await apiInstance.submitTransaction(txSubmission.tx);
-            console.log('[Lace] Transaction submitted to Midnight consensus network!');
-          } catch (subErr: any) {
-            console.warn('[Lace] submitTransaction notice:', subErr?.message || subErr);
-          }
-        }
-      }
-
         setCircuitStage('submitting');
 
         if (txSubmission?.txHash && typeof txSubmission.txHash === 'string') {
