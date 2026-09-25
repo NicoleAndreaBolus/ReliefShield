@@ -813,7 +813,8 @@ export function useMidnight() {
         setCircuitStage('idle');
       }, 2000);
 
-      return { txHash: realTxHash, newBalance: updatedPool };
+      const newPoolValue = (totalReliefPool ?? 0) + secretAmount;
+      return { txHash: realTxHash, newBalance: newPoolValue };
     } catch (err: any) {
       console.error('[ReliefShield ZK] donateShielded error:', err);
       console.error('[ReliefShield ZK] error details:', {
