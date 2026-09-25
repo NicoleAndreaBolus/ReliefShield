@@ -197,7 +197,7 @@ export async function detectLatestOnChainDonation(
   amountTokens: number,
   startHeight?: number,
   network: 'preview' | 'preprod' = 'preview',
-  maxPollAttempts: number = 6
+  maxPollAttempts: number = 12
 ): Promise<{ hash: string; blockHeight: number } | null> {
   const indexerEndpoint = network === 'preview' 
     ? RELIEF_SHIELD_CONTRACT_CONFIG.indexerUrl 
@@ -209,7 +209,7 @@ export async function detectLatestOnChainDonation(
     let currentTip = startHeight || await getCurrentBlockHeight(network);
     if (!currentTip) return null;
 
-    const minHeight = Math.max(1, currentTip - 2);
+    const minHeight = Math.max(1, currentTip - 3);
 
     for (let attempt = 0; attempt < maxPollAttempts; attempt++) {
       const latestTip = (await getCurrentBlockHeight(network)) || currentTip;
@@ -242,7 +242,17 @@ export async function detectLatestOnChainDonation(
         const txs = blkJson.data?.block?.transactions || [];
         for (const tx of txs) {
           const match = (tx.unshieldedCreatedOutputs || []).some(
-            (out: any) => out.owner === treasuryAddress && out.value === expectedMicroUnits
+            (out: any) => {
+              const cleanOutOwner = String(out.owner || '').replace(/^0x/, '').toLowerCase();
+              const cleanTreasury = String(treasuryAddress || '').replace(/^0x/, '').toLowerCase();
+              const ownerMatch = cleanOutOwner === cleanTreasury;
+              const valueMatch =
+                String(out.value) === expectedMicroUnits ||
+                String(out.value) === String(amountTokens) ||
+                Number(out.value) === Number(expectedMicroUnits) ||
+                Number(out.value) === Number(amountTokens);
+              return ownerMatch && valueMatch;
+            }
           );
           if (match) {
             const cleanHash = tx.hash.startsWith('0x') ? tx.hash : `0x${tx.hash}`;
