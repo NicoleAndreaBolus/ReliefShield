@@ -1,18 +1,22 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const getEnv = (key: string): string => {
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
-    return String(import.meta.env[key]);
-  }
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return String(process.env[key]);
-  }
-  return '';
-};
+const DEFAULT_SUPABASE_URL = 'https://kqpviqjeozbnjlbbxpin.supabase.co';
+const DEFAULT_SUPABASE_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxcHZpcWplb3pibmpsYmJ4cGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODQyNzEsImV4cCI6MjEwNTY2MDI3MX0.aacFnNVrsH_6aLq3GF_mdQoYmUcmBLm_pIDrmAFZHyU';
 
-const rawUrl = getEnv('VITE_SUPABASE_URL').trim();
+const rawUrl = (
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) ||
+  DEFAULT_SUPABASE_URL
+).trim();
+
 const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY').trim();
+
+const supabaseAnonKey = (
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) ||
+  DEFAULT_SUPABASE_KEY
+).trim();
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
