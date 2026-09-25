@@ -723,7 +723,7 @@ export function useMidnight() {
             const bytes = new Uint8Array(
               cleanHex.match(/.{1,2}/g)?.map((byte: string) => parseInt(byte, 16)) || []
             );
-            const parsedTx = ledger.Transaction.deserialize('SignatureEnabled', 'Proof', 'Binding', bytes);
+            const parsedTx = ledger.Transaction.deserialize('signature', 'proof', 'binding', bytes);
             const computedHash = parsedTx.transactionHash();
             if (computedHash && typeof computedHash === 'string') {
               realTxHash = computedHash.startsWith('0x') ? computedHash : `0x${computedHash}`;
