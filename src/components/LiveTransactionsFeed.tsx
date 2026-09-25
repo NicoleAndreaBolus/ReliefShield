@@ -185,7 +185,8 @@ export const LiveTransactionsFeed: React.FC<LiveTransactionsFeedProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {donations.map((tx, idx) => {
-              const explorerUrl = `https://preview.midnightexplorer.com/transactions/${tx.tx_hash}`;
+              const formattedHash = tx.tx_hash.startsWith('0x') ? tx.tx_hash : `0x${tx.tx_hash}`;
+              const explorerUrl = `https://preview.midnightexplorer.com/transactions/${formattedHash}`;
               return (
                 <div
                   key={tx.id || `${tx.tx_hash}-${idx}`}

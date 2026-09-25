@@ -298,7 +298,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 font-mono break-all space-y-1">
               <div>✓ Tx Hash: {circuitSuccess.slice(0, 24)}...</div>
               <a
-                href={`https://preview.midnightexplorer.com/transactions/${circuitSuccess}`}
+                href={`https://preview.midnightexplorer.com/transactions/${circuitSuccess.startsWith('0x') ? circuitSuccess : `0x${circuitSuccess}`}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline"

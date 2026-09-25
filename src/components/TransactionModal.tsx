@@ -203,7 +203,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                   </div>
                   <p className="text-[11px] text-emerald-950">Hash: {txHash}</p>
                   <a
-                    href={`https://preview.midnightexplorer.com/transactions/${txHash}`}
+                    href={`https://preview.midnightexplorer.com/transactions/${txHash.startsWith('0x') ? txHash : `0x${txHash}`}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 underline pt-1"

@@ -5,6 +5,14 @@ import { fromHex } from '@midnight-ntwrk/compact-runtime';
 import { Transaction } from '@midnight-ntwrk/ledger-v8';
 import { RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from './contract';
 
+// Tracks the latest 32-byte consensus transaction hash submitted to Lace relayer
+let latestSubmittedTxHash: string = '';
+const txIdToConsensusHash = new Map<string, string>();
+
+export function getLatestSubmittedTxHash(): string {
+  return latestSubmittedTxHash;
+}
+
 /**
  * Browser-compatible ZKConfigProvider that fetches prover keys, verifier keys,
  * and ZKIR assets over HTTP from the application's public assets directory.
@@ -187,14 +195,33 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
     ...basePublicDataProvider,
     watchForTxData: async (txId: string) => {
       console.log(`[Indexer] Watching for transaction finalization on-chain: ${txId}...`);
-      const watchPromise = basePublicDataProvider.watchForTxData(txId);
+      const consensusHash =
+        txIdToConsensusHash.get(txId) ||
+        latestSubmittedTxHash ||
+        (txId.startsWith('0x') ? txId : `0x${txId}`);
+
+      const watchPromise = basePublicDataProvider.watchForTxData(txId).then((res: any) => {
+        if (res) {
+          const rawH = res.txHash ? String(res.txHash).replace(/^0x/, '') : '';
+          const isRealHash = rawH && rawH.length === 64 && !rawH.startsWith('00');
+          const finalTxHash = isRealHash
+            ? (res.txHash.startsWith('0x') ? res.txHash : `0x${res.txHash}`)
+            : consensusHash;
+          return {
+            ...res,
+            txHash: finalTxHash,
+          };
+        }
+        return res;
+      });
+
       const timeoutPromise = new Promise((resolve) =>
         setTimeout(() => {
           console.log(`[Indexer] Fast confirmation timeout reached for ${txId}; proceeding with broadcasted status.`);
           resolve({
             status: 'SucceedEntirely',
             txId,
-            txHash: txId,
+            txHash: consensusHash,
             blockHeight: 0,
           });
         }, 15000)
@@ -268,11 +295,32 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
       if (typeof apiInstance?.submitTransaction === 'function') {
         let payload: string;
         let txId: string = '';
+        let consensusHash: string = '';
+
+        // Extract consensus transaction hash (32 bytes, 64 hex characters) if available
+        if (tx && typeof tx.transactionHash === 'function') {
+          try {
+            const h = tx.transactionHash();
+            if (h && typeof h === 'string') {
+              consensusHash = h.startsWith('0x') ? h : `0x${h}`;
+            }
+          } catch (e) {
+            console.warn('[Lace] Could not get tx.transactionHash():', e);
+          }
+        }
+
         if (typeof tx === 'string') {
           payload = tx;
           if (payload.length > 64) {
             try {
               const raw = fromHex(payload.replace(/^0x/, ''));
+              try {
+                const parsed = Transaction.deserialize('signature', 'proof', 'binding', raw);
+                if (typeof parsed.transactionHash === 'function') {
+                  const h = parsed.transactionHash();
+                  if (h) consensusHash = h.startsWith('0x') ? h : `0x${h}`;
+                }
+              } catch {}
               const hashBuf = await crypto.subtle.digest('SHA-256', raw);
               txId = Array.from(new Uint8Array(hashBuf)).map((b) => b.toString(16).padStart(2, '0')).join('');
             } catch {}
@@ -288,10 +336,8 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
               if (ids && ids.length > 0) txId = ids[0];
             } catch {}
           }
-          if (!txId && typeof tx.transactionHash === 'function') {
-            try {
-              txId = tx.transactionHash();
-            } catch {}
+          if (!txId && consensusHash) {
+            txId = consensusHash.replace(/^0x/, '');
           }
           if (!txId) {
             try {
@@ -302,14 +348,29 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
         } else if (tx?.tx && typeof tx.tx === 'string') {
           payload = tx.tx;
           txId = tx.txId || '';
+          if (tx.txHash) {
+            consensusHash = tx.txHash.startsWith('0x') ? tx.txHash : `0x${tx.txHash}`;
+          }
         } else {
           payload = String(tx);
         }
+
+        if (consensusHash) {
+          latestSubmittedTxHash = consensusHash;
+          if (txId) {
+            txIdToConsensusHash.set(txId, consensusHash);
+          }
+          console.log('[Lace] Captured consensus transaction hash:', consensusHash, 'for txId:', txId);
+        }
+
         await apiInstance.submitTransaction(payload);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('midnight:stage', { detail: 'submitting' }));
+          if (consensusHash) {
+            window.dispatchEvent(new CustomEvent('midnight:tx-hash', { detail: consensusHash }));
+          }
         }
-        console.log('[Lace] Relayed transaction accepted! TxId:', txId);
+        console.log('[Lace] Relayed transaction accepted! TxId:', txId, 'ConsensusHash:', consensusHash);
         return txId || payload;
       }
       throw new Error('Lace submitTransaction API is unavailable');

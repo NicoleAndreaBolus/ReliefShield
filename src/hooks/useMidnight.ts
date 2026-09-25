@@ -14,7 +14,7 @@ import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
-import { createBrowserProviders } from '../utils/midnightProviders';
+import { createBrowserProviders, getLatestSubmittedTxHash } from '../utils/midnightProviders';
 
 /**
  * Custom Hook for Midnight Lace Wallet Connection & ReliefShield ZK Circuit Execution
@@ -646,44 +646,108 @@ export function useMidnight() {
           const callResult = await deployed.callTx.donateShielded(specks, nullifierBytes);
           console.log('[ReliefShield ZK] Contract transaction confirmed via callTx:', callResult);
 
-          if (callResult?.public?.txId) {
-            realTxHash = callResult.public.txId.startsWith('0x') ? callResult.public.txId : `0x${callResult.public.txId}`;
-          } else if (callResult?.txId) {
-            realTxHash = callResult.txId.startsWith('0x') ? callResult.txId : `0x${callResult.txId}`;
-          }
           txSubmission = callResult;
+
+          // Priority 1: Extract 32-byte consensus transaction hash from callResult.public.txHash
+          if (callResult?.public?.txHash && typeof callResult.public.txHash === 'string') {
+            const h = callResult.public.txHash;
+            const raw = h.replace(/^0x/, '');
+            if (raw.length === 64 && !raw.startsWith('00')) {
+              realTxHash = h.startsWith('0x') ? h : `0x${h}`;
+              console.log('[ReliefShield ZK] Extracted consensus hash from callResult.public.txHash:', realTxHash);
+            }
+          }
+
+          // Priority 2: Extract directly from callResult.public.tx (the finalized Transaction object)
+          if (!realTxHash && callResult?.public?.tx && typeof callResult.public.tx.transactionHash === 'function') {
+            try {
+              const h = callResult.public.tx.transactionHash();
+              if (h && typeof h === 'string') {
+                realTxHash = h.startsWith('0x') ? h : `0x${h}`;
+                console.log('[ReliefShield ZK] Extracted consensus hash from callResult.public.tx:', realTxHash);
+              }
+            } catch (txHashErr) {
+              console.warn('[ReliefShield ZK] tx.transactionHash extraction notice:', txHashErr);
+            }
+          }
+
+          // Priority 3: Extract from Lace submitTx relayer captured consensus hash
+          if (!realTxHash) {
+            const captured = getLatestSubmittedTxHash();
+            if (captured && captured.replace(/^0x/, '').length === 64) {
+              realTxHash = captured.startsWith('0x') ? captured : `0x${captured}`;
+              console.log('[ReliefShield ZK] Using consensus hash captured during Lace submitTx:', realTxHash);
+            }
+          }
+
+          // Priority 4: Check callResult.txHash or callResult.hash
+          if (!realTxHash && callResult?.txHash && typeof callResult.txHash === 'string') {
+            const h = callResult.txHash;
+            const raw = h.replace(/^0x/, '');
+            if (raw.length === 64 && !raw.startsWith('00')) {
+              realTxHash = h.startsWith('0x') ? h : `0x${h}`;
+            }
+          }
+
+          // Priority 5: Fallback to segment ID (txId) only if consensus hash could not be retrieved
+          if (!realTxHash) {
+            if (callResult?.public?.txId) {
+              realTxHash = callResult.public.txId.startsWith('0x') ? callResult.public.txId : `0x${callResult.public.txId}`;
+            } else if (callResult?.txId) {
+              realTxHash = callResult.txId.startsWith('0x') ? callResult.txId : `0x${callResult.txId}`;
+            }
+          }
         } catch (callErr: any) {
           console.error('[ReliefShield ZK] deployed.callTx.donateShielded error:', callErr);
           throw callErr;
         }
       }
 
-        setCircuitStage('submitting');
+      setCircuitStage('submitting');
 
-        if (txSubmission?.txHash && typeof txSubmission.txHash === 'string') {
-          realTxHash = txSubmission.txHash.startsWith('0x') ? txSubmission.txHash : `0x${txSubmission.txHash}`;
-        } else if (txSubmission?.hash && typeof txSubmission.hash === 'string') {
-          realTxHash = txSubmission.hash.startsWith('0x') ? txSubmission.hash : `0x${txSubmission.hash}`;
+      // Check if realTxHash is a 33-byte segment ID starting with 00 (66 hex chars / 68 with 0x)
+      // and replace with captured consensus hash if available
+      const rawHexCheck = realTxHash ? realTxHash.replace(/^0x/, '') : '';
+      if (rawHexCheck.length === 66 && rawHexCheck.startsWith('00')) {
+        const captured = getLatestSubmittedTxHash();
+        if (captured && captured.replace(/^0x/, '').length === 64) {
+          console.log('[ReliefShield ZK] Replaced segment ID with captured 32-byte consensus txHash:', captured);
+          realTxHash = captured.startsWith('0x') ? captured : `0x${captured}`;
         }
+      }
 
-        // Attempt direct transaction hash extraction from serialized transaction payload
-        if (!realTxHash && txSubmission?.tx && typeof txSubmission.tx === 'string') {
-          try {
-            const ledger = await import('@midnight-ntwrk/ledger-v8');
-            const cleanHex = txSubmission.tx.replace(/^0x/, '');
-            const bytes = new Uint8Array(
-              cleanHex.match(/.{1,2}/g)?.map((byte: string) => parseInt(byte, 16)) || []
-            );
-            const parsedTx = ledger.Transaction.deserialize('signature', 'proof', 'binding', bytes);
-            const computedHash = parsedTx.transactionHash();
-            if (computedHash && typeof computedHash === 'string') {
-              realTxHash = computedHash.startsWith('0x') ? computedHash : `0x${computedHash}`;
-              console.log('[Lace] Derived transaction hash from sealed transaction payload:', realTxHash);
-            }
-          } catch (deserErr) {
-            console.warn('[Lace] Direct transaction hash extraction notice:', deserErr);
+      if (txSubmission?.txHash && typeof txSubmission.txHash === 'string') {
+        const h = txSubmission.txHash;
+        const raw = h.replace(/^0x/, '');
+        if (raw.length === 64 && !raw.startsWith('00')) {
+          realTxHash = h.startsWith('0x') ? h : `0x${h}`;
+        }
+      } else if (txSubmission?.hash && typeof txSubmission.hash === 'string') {
+        const h = txSubmission.hash;
+        const raw = h.replace(/^0x/, '');
+        if (raw.length === 64 && !raw.startsWith('00')) {
+          realTxHash = h.startsWith('0x') ? h : `0x${h}`;
+        }
+      }
+
+      // Attempt direct transaction hash extraction from serialized transaction payload
+      if ((!realTxHash || realTxHash.replace(/^0x/, '').length === 66) && txSubmission?.tx && typeof txSubmission.tx === 'string') {
+        try {
+          const ledger = await import('@midnight-ntwrk/ledger-v8');
+          const cleanHex = txSubmission.tx.replace(/^0x/, '');
+          const bytes = new Uint8Array(
+            cleanHex.match(/.{1,2}/g)?.map((byte: string) => parseInt(byte, 16)) || []
+          );
+          const parsedTx = ledger.Transaction.deserialize('signature', 'proof', 'binding', bytes);
+          const computedHash = parsedTx.transactionHash();
+          if (computedHash && typeof computedHash === 'string') {
+            realTxHash = computedHash.startsWith('0x') ? computedHash : `0x${computedHash}`;
+            console.log('[Lace] Derived transaction hash from sealed transaction payload:', realTxHash);
           }
+        } catch (deserErr) {
+          console.warn('[Lace] Direct transaction hash extraction notice:', deserErr);
         }
+      }
 
         // Automatically detect on-chain contract transaction by polling blocks from the Midnight Indexer
         if (!realTxHash) {
@@ -724,6 +788,21 @@ export function useMidnight() {
             }
           }
         }
+
+      // Ensure realTxHash is the 32-byte consensus hash rather than a 33-byte segment ID
+      if (realTxHash) {
+        const rawHex = realTxHash.replace(/^0x/, '');
+        if (rawHex.length === 66 && rawHex.startsWith('00')) {
+          const captured = getLatestSubmittedTxHash();
+          if (captured && captured.replace(/^0x/, '').length === 64) {
+            console.log('[ReliefShield ZK] Replacing segment ID with consensus hash before completion:', captured);
+            realTxHash = captured.startsWith('0x') ? captured : `0x${captured}`;
+          }
+        }
+        if (!realTxHash.startsWith('0x')) {
+          realTxHash = `0x${realTxHash}`;
+        }
+      }
 
       // No fake fallback hashes — if the transaction was not confirmed, throw a real error
       if (!realTxHash) {

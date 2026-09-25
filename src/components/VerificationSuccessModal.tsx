@@ -11,6 +11,7 @@ import {
   X 
 } from 'lucide-react';
 import { getDeployedContractAddress } from '../utils/contract';
+import { getLatestSubmittedTxHash } from '../utils/midnightProviders';
 
 export interface VerificationSuccessData {
   txHash: string;
@@ -37,16 +38,26 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
 
   if (!isOpen || !data) return null;
 
-  const effectiveHash = (customHash.trim() || data.txHash || '').trim();
+  const rawInput = (customHash.trim() || data.txHash || '').trim();
+  let effectiveHash = rawInput;
+  const rawHex = rawInput.replace(/^0x/, '');
+  if (rawHex.length === 66 && rawHex.startsWith('00')) {
+    const latest = getLatestSubmittedTxHash();
+    if (latest && latest.replace(/^0x/, '').length === 64) {
+      effectiveHash = latest;
+    }
+  }
+  const formattedHash = effectiveHash ? (effectiveHash.startsWith('0x') ? effectiveHash : `0x${effectiveHash}`) : '';
+  const explorerUrl = `https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/transactions/${formattedHash}`;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(effectiveHash);
+      await navigator.clipboard.writeText(formattedHash);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
       const el = document.createElement('textarea');
-      el.value = effectiveHash;
+      el.value = formattedHash;
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -55,9 +66,6 @@ export const VerificationSuccessModal: React.FC<VerificationSuccessModalProps> =
       setTimeout(() => setCopied(false), 2500);
     }
   };
-
-  const cleanHash = effectiveHash ? effectiveHash.replace(/^0x/, '') : '';
-  const explorerUrl = `https://${network === 'preprod' ? 'preprod' : 'preview'}.midnightexplorer.com/transactions/${cleanHash}`;
 
   return (
     <div className="fixed inset-0 z-[110] bg-[#1C1917]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-200">

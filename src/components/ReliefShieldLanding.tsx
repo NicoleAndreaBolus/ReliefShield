@@ -287,7 +287,7 @@ export const ReliefShieldLanding: React.FC<ReliefShieldLandingProps> = ({
                     Tx: {txResultHash}
                   </p>
                   <a
-                    href={`https://preview.midnightexplorer.com/transactions/${txResultHash}`}
+                    href={`https://preview.midnightexplorer.com/transactions/${txResultHash.startsWith('0x') ? txResultHash : `0x${txResultHash}`}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 font-sans text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline pt-0.5"
