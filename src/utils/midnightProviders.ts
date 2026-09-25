@@ -1,5 +1,6 @@
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
+import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { fromHex } from '@midnight-ntwrk/compact-runtime';
 import { RELIEF_SHIELD_CONTRACT_CONFIG, PREPROD_CONTRACT_CONFIG } from './contract';
 
@@ -127,20 +128,35 @@ export class BrowserPrivateStateProvider {
  * - walletProvider & midnightProvider (bridged to Midnight Lace DApp Connector API)
  */
 export async function createBrowserProviders(apiInstance: any, network: 'preview' | 'preprod') {
+  // 1. Ensure global Midnight network ID is configured before any operation
+  try {
+    const config = await apiInstance?.getConfiguration?.();
+    if (config?.networkId) {
+      setNetworkId(config.networkId);
+      console.log(`[ReliefShield ZK] Set network ID from wallet config: ${config.networkId}`);
+    } else {
+      setNetworkId(network);
+      console.log(`[ReliefShield ZK] Set network ID: ${network}`);
+    }
+  } catch {
+    setNetworkId(network);
+    console.log(`[ReliefShield ZK] Fallback network ID: ${network}`);
+  }
+
   const activeConfig = network === 'preprod' ? PREPROD_CONTRACT_CONFIG : RELIEF_SHIELD_CONTRACT_CONFIG;
   const zkConfigProvider = new FetchZkConfigProvider('/reliefshield');
 
-  // 1. Official HTTP Client Proof Provider
+  // 2. Official HTTP Client Proof Provider
   const proofProvider = httpClientProofProvider(activeConfig.proofServerUrl, zkConfigProvider as any);
 
-  // 2. Official Indexer Public Data Provider
+  // 3. Official Indexer Public Data Provider
   const indexerWs = activeConfig.indexerUrl.replace(/^http/, 'ws');
   const publicDataProvider = indexerPublicDataProvider(activeConfig.indexerUrl, indexerWs);
 
-  // 3. Browser-native Private State Provider
+  // 4. Browser-native Private State Provider
   const privateStateProvider = new BrowserPrivateStateProvider();
 
-  // 4. Resolve user keys from Lace
+  // 5. Resolve user keys from Lace
   let shieldedInfo: any = null;
   try {
     shieldedInfo = await apiInstance?.getShieldedAddresses?.();
@@ -156,14 +172,22 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
     ? fromHex(shieldedInfo.encryptionPublicKey.replace(/^0x/, ''))
     : new Uint8Array(32);
 
-  // 5. Wallet Provider & Midnight Provider bridged to Lace ConnectedAPI
+  // 6. Wallet Provider & Midnight Provider bridged to Lace ConnectedAPI
   const walletProvider = {
     getCoinPublicKey: () => coinPublicKeyBytes as any,
     getEncryptionPublicKey: () => encPublicKeyBytes as any,
     balanceTx: async (tx: any) => {
       console.log('[Lace] Balancing unsealed contract transaction in Lace wallet...');
       if (typeof apiInstance?.balanceUnsealedTransaction === 'function') {
-        const payload = typeof tx === 'string' ? tx : JSON.stringify(tx);
+        let payload: string;
+        if (typeof tx === 'string') {
+          payload = tx;
+        } else if (tx && typeof tx.serialize === 'function') {
+          const bytes = tx.serialize();
+          payload = Array.from(bytes).map((b: number) => b.toString(16).padStart(2, '0')).join('');
+        } else {
+          payload = JSON.stringify(tx);
+        }
         const balanced = await apiInstance.balanceUnsealedTransaction(payload, { payFees: true });
         return balanced?.tx || balanced;
       }
@@ -172,7 +196,17 @@ export async function createBrowserProviders(apiInstance: any, network: 'preview
     submitTx: async (tx: any) => {
       console.log('[Lace] Submitting contract transaction through Lace relayer...');
       if (typeof apiInstance?.submitTransaction === 'function') {
-        const payload = typeof tx === 'string' ? tx : JSON.stringify(tx);
+        let payload: string;
+        if (typeof tx === 'string') {
+          payload = tx;
+        } else if (tx && typeof tx.serialize === 'function') {
+          const bytes = tx.serialize();
+          payload = Array.from(bytes).map((b: number) => b.toString(16).padStart(2, '0')).join('');
+        } else if (tx?.tx && typeof tx.tx === 'string') {
+          payload = tx.tx;
+        } else {
+          payload = JSON.stringify(tx);
+        }
         await apiInstance.submitTransaction(payload);
         return payload;
       }

@@ -13,6 +13,7 @@ import { Contract } from '../../contracts/managed/reliefshield/contract/index.js
 import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { createBrowserProviders } from '../utils/midnightProviders';
 
 /**
@@ -571,7 +572,12 @@ export function useMidnight() {
         for (let i = 0; i < 32; i++) nullifierBytes[i] = Math.floor(Math.random() * 256);
       }
 
-      // 1. Instantiate the generated ReliefShield Compact contract
+      // 1. Configure global network identifier for Midnight SDK
+      try {
+        setNetworkId(walletState.network);
+      } catch {}
+
+      // 2. Instantiate the generated ReliefShield Compact contract
       const deployedContractAddress = getDeployedContractAddress(walletState.network);
       console.log(`[ReliefShield ZK] Binding to deployed contract at ${deployedContractAddress}...`);
 
@@ -579,7 +585,7 @@ export function useMidnight() {
         CompiledContract.withVacantWitnesses,
       );
 
-      // 2. Configure official providers (proof provider, level-backed private state provider, indexer public data provider)
+      // 3. Configure official providers (proof provider, browser-native private state provider, indexer public data provider)
       const providers = await createBrowserProviders(apiInstance, walletState.network);
 
       // 3. Connect to deployed contract using official findDeployedContract()
